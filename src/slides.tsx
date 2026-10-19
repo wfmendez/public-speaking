@@ -28,16 +28,16 @@ const Dot = ({ x, y, at = 0, delay = 0, accent }: { x: number; y: number; at?: n
 )
 
 export const slides: SlideDef[] = [
-  // 1 · Title
+  // 1 · Starts as blank paper while the speaker walks up; the first click draws the title
   {
-    steps: 0,
+    steps: 1,
     Slide: () => (
       <>
-        <T x={800} y={390} size={104} dur={1.2}>The Importance of</T>
-        <T x={800} y={530} size={136} delay={0.9} dur={1.3} weight={600}>
+        <T x={800} y={390} size={104} at={1} dur={1.2}>The Importance of</T>
+        <T x={800} y={530} size={136} at={1} delay={0.9} dur={1.3} weight={600}>
           <tspan style={{ fill: 'var(--accent)' }}>Failure</tspan> in Success
         </T>
-        <D d="M470,575 C560,592 650,560 740,580" accent width={5} delay={2.1} dur={0.8} />
+        <D d="M470,575 C560,592 650,560 740,580" accent at={1} width={5} delay={2.1} dur={0.8} />
       </>
     ),
   },

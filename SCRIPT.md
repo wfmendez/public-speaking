@@ -7,9 +7,12 @@ The *Nota* under each part is for you (Spanish): intention and tone, not to be r
 
 ## 1 · Title — 0:00
 
-Good morning. Today I want to talk about the importance of failure in success.
+*(The screen is blank paper while you walk up. Stand still, smile, look at the audience.)*
 
-> *Nota:* Empieza lento y sonriendo. Una sola frase y pasa al chiste.
+Good morning.
+`[CLICK]` Today I want to talk about the importance of failure in success.
+
+> *Nota:* Antes de hablar, la pantalla está vacía para que todas las miradas estén en ti. Di "Good morning" mirando al público y haz clic mientras empiezas la segunda frase, así el título se dibuja mientras lo dices.
 
 ## 2 · The Paint sketches — 0:08
 
@@ -130,5 +133,5 @@ Thank you.
 
 ---
 
-**Click count:** 29 clicks from the title to the last slide.
+**Click count:** 30 clicks from the blank screen to the last slide.
 **Length:** ~600 spoken words + pauses ≈ 5 minutes at a calm pace (about 130 words per minute). Rehearse it with a timer at least 3 times.

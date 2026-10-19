@@ -83,7 +83,7 @@ export default function App() {
           </g>
         </StepContext.Provider>
       </svg>
-      {progress && <div className="progress" style={{ width: `${(done / total) * 100}%` }} />}
+      {progress && done > 1 && <div className="progress" style={{ width: `${(done / total) * 100}%` }} />}
       <div className={`blackout${black ? ' on' : ''}`} />
     </main>
   )
