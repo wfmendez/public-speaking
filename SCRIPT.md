@@ -36,7 +36,7 @@ I know, because this line is mine.
 ## 4 · Everything was fine — 0:45
 
 `[CLICK]`
-A few years ago, I thought my life was perfect. I was engaged. I had my own business. I was studying at university. And I had not one, but two jobs.
+A few years ago, I thought my life was perfect. I was engaged. I had my own business. I was studying at university. And I had not one, but two jobs. I had savings, and a family I loved, especially my aunt, who was like a second mother to me.
 Everything was fine.
 
 > *Nota:* Tono ligero, casi orgulloso. El contraste con lo que viene es lo que da fuerza.
@@ -51,11 +51,11 @@ Then, one by one, it started to fall.
 `[CLICK]` I left university.
 `[CLICK]` The pandemic came, and I lost both of my jobs.
 `[CLICK]` I lost money I had worked years to save.
-`[CLICK]` *(pause)* And then I lost my aunt. She was my second mother. *(pause — 3 seconds)*
+`[CLICK]` *(pause)* And then I lost my aunt. My second mother. *(pause — 3 seconds)*
 
 Some of these were my failures. Some just happened to me. But all of them knocked me down.
 
-> *Nota:* Ritmo rápido y seco en las cinco primeras, un clic por frase. En tu tía, baja la voz y detente de verdad. Es el momento más fuerte del speech; no lo apresures.
+> *Nota:* A tu tía no se le pone una X: en el último clic todo lo demás se apaga, ella queda encendida y aparece una vela debajo. Ritmo rápido y seco en las cinco primeras, un clic por frase. En tu tía, baja la voz y detente de verdad. Es el momento más fuerte del speech; no lo apresures.
 
 ## 6 · Every time I rose, I fell — 1:50
 

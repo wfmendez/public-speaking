@@ -14,8 +14,9 @@ const TANGLE =
   'C1150,640 1120,705 1060,665 C980,605 1050,470 1120,430 C1200,385 1330,300 1466,236'
 
 // The losses, in the order they happened.
-const LIFE: IconName[] = ['ring', 'shop', 'cap', 'briefcase', 'briefcase', 'coins']
-const slot = (i: number) => 300 + i * 200
+// Family (my aunt) is last: she is never crossed out; a candle lights under her instead.
+const LIFE: IconName[] = ['ring', 'shop', 'cap', 'briefcase', 'briefcase', 'coins', 'family']
+const slot = (i: number) => 200 + i * 200
 
 const DESCENT =
   'M150,330 Q205,280 260,285 Q320,300 380,440 Q425,385 475,390 Q540,410 600,550 ' +
@@ -98,14 +99,15 @@ export const slides: SlideDef[] = [
       <>
         <T x={800} y={190} size={100}>One by one.</T>
         <G until={6} dur={0.2}>
-          {LIFE.map((name, i) => (
+          {LIFE.slice(0, -1).map((name, i) => (
             <Icon key={i} name={name} x={slot(i)} y={470} size={1.1} delay={i * 0.12} speed={0.35} />
           ))}
           {[1, 2, 3, 4, 4, 5].map((at, i) => (
             <Icon key={i} name="cross" x={slot(i)} y={470} size={0.85} accent at={at} delay={i === 4 ? 0.35 : 0} speed={0.45} />
           ))}
         </G>
-        <Icon name="candle" x={800} y={720} size={1.15} at={6} delay={0.6} speed={1.1} />
+        <Icon name="family" x={slot(6)} y={470} size={1.1} delay={0.72} speed={0.35} />
+        <Icon name="candle" x={slot(6)} y={680} size={1} at={6} delay={0.6} speed={1.1} />
       </>
     ),
   },
