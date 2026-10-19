@@ -1,5 +1,8 @@
 import { D } from './components/Draw'
 
+// The candle flame is drawn in warm yellow (see .draw.flame), in memory of the aunt.
+const FLAME = 'M0,-15 C-11,-25 -7,-38 0,-48 C7,-38 11,-25 0,-15 Z'
+
 /** Hand-drawn icons, each a list of strokes inside a 100×100 box centred on (0,0). */
 export const ICONS = {
   ring: [
@@ -40,7 +43,7 @@ export const ICONS = {
   candle: [
     'M-14,-4 H14 V46 H-14 Z',
     'M0,-4 V-13',
-    'M0,-15 C-11,-25 -7,-38 0,-48 C7,-38 11,-25 0,-15 Z',
+    FLAME,
   ],
   globe: [
     'M-40,0 a40,40 0 1,0 80,0 a40,40 0 1,0 -80,0',
@@ -86,7 +89,7 @@ export function Icon({
     <g transform={`translate(${x} ${y}) scale(${size})`}>
       {ICONS[name].map((d, i) => (
         <D
-          key={i} d={d} at={at} until={until} accent={accent} soft={soft}
+          key={i} d={d} at={at} until={until} accent={accent} soft={soft} flame={d === FLAME}
           width={3.6 / size} delay={delay + i * speed * 0.6} dur={speed}
         />
       ))}

@@ -3,6 +3,8 @@
   --ink: #2c2a27;
   --soft: #cfc7b8;
   --accent: #d2702f;
+  --flame: #e8a317;
+  --flame-glow: #fbe3a0;
   --ease: cubic-bezier(0.33, 0.1, 0.25, 1);
 }
 
@@ -47,12 +49,15 @@ html, body, #root {
   transition:
     stroke-dashoffset var(--dur) var(--ease) var(--delay),
     stroke-opacity 0s linear var(--delay),
+    fill-opacity 0.8s var(--ease) calc(var(--delay) + var(--dur)),
     stroke 0.9s var(--ease),
     opacity 0.9s var(--ease);
 }
 .draw.on { stroke-dashoffset: 0; stroke-opacity: 1; }
 .draw.accent { stroke: var(--accent); }
 .draw.soft { stroke: var(--soft); }
+.draw.flame { stroke: var(--flame); fill: var(--flame-glow); fill-opacity: 0; }
+.draw.flame.on { fill-opacity: 1; }
 .draw.dim { stroke: var(--soft); opacity: 0.55; }
 
 /* handwritten text that wipes in */

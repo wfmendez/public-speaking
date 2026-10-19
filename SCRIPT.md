@@ -16,19 +16,16 @@ But as you can see, I'm not an artist. Luckily, I'm a programmer. So… version 
 
 > *Nota:* La pantalla vacía hace que todas las miradas estén en ti. No expliques los dibujos todavía; que solo se vean "feos". Quédate callado mientras se ríen. Todo el chiste no debe pasar de 15–20 segundos.
 
-## 2 · What success really is → the title — 0:15
+## 2 · What success really is — 0:15
 
 `[CLICK]`
 This is what most people think success looks like. You start here, you work hard, and you go straight up to your goal.
 
 `[CLICK]`
 And this is what success really looks like. Loops. Turns. Moments where you go backwards. *(pause)*
+Today I want to show you why every one of these loops matters. Because this line… is mine.
 
-`[CLICK]`
-That's why today I want to talk about the importance of failure in success. *(pause)*
-Because this line… is mine.
-
-> *Nota:* Deja que el enredo se dibuje en silencio unos segundos. Luego haz clic: el dibujo se desvanece y el título se escribe encima mientras lo dices. El título llega como respuesta a los dibujos, no como portada.
+> *Nota:* Deja que el enredo se dibuje en silencio unos segundos antes de hablar. No hace falta decir el título exacto: esta frase deja claro el tema, y el cierre ("Failure was the material") lo remata.
 
 ## 3 · Everything was fine — 0:45
 
@@ -130,5 +127,5 @@ Thank you.
 
 ---
 
-**Click count:** 30 clicks from the blank screen to the last slide.
+**Click count:** 29 clicks from the blank screen to the last slide.
 **Length:** ~600 spoken words + pauses ≈ 5 minutes at a calm pace (about 130 words per minute). Rehearse it with a timer at least 3 times.

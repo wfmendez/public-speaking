@@ -12,11 +12,11 @@ const timing = (delay = 0, dur = 1): CSSProperties =>
 
 /** A stroke that draws itself when its step is reached (and greys out at `until`). */
 export function D({
-  d, at = 0, delay = 0, dur = 1, accent, soft, width = 4, until,
-}: Timing & { d: string; accent?: boolean; soft?: boolean; width?: number; until?: number }) {
+  d, at = 0, delay = 0, dur = 1, accent, soft, flame, width = 4, until,
+}: Timing & { d: string; accent?: boolean; soft?: boolean; flame?: boolean; width?: number; until?: number }) {
   const on = useOn(at)
   const dim = useOn(until ?? Infinity)
-  const cls = ['draw', on && 'on', accent && 'accent', soft && 'soft', dim && 'dim']
+  const cls = ['draw', on && 'on', accent && 'accent', soft && 'soft', flame && 'flame', dim && 'dim']
   return (
     <path
       d={d}

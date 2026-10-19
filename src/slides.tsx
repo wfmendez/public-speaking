@@ -47,24 +47,17 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 2 · What people think success is → what it really is → the title, written over the faded tangle
+  // 2 · What people think success is → what it really is
   {
-    steps: 2,
+    steps: 1,
     Slide: () => (
       <>
         <T x={800} y={150} size={88} until={1}>What people think success is</T>
-        <T x={800} y={150} size={88} at={1} delay={0.4} until={2}>What success really is</T>
-        <G dur={0.3} until={2} dimTo={0.14}>
-          <Dot x={150} y={780} />
-          <D d={STRAIGHT} dur={2.2} delay={0.5} until={1} />
-          <Icon name="flag" x={1484} y={192} size={0.8} delay={2.5} speed={0.5} />
-          <D d={TANGLE} at={1} dur={5} delay={0.9} />
-        </G>
-        <T x={800} y={400} size={104} at={2} delay={0.6} dur={1.2}>The Importance of</T>
-        <T x={800} y={540} size={136} at={2} delay={1.5} dur={1.3} weight={600}>
-          <tspan style={{ fill: 'var(--accent)' }}>Failure</tspan> in Success
-        </T>
-        <D d="M470,585 C560,602 650,570 740,590" accent at={2} width={5} delay={2.7} dur={0.8} />
+        <T x={800} y={150} size={88} at={1} delay={0.4}>What success really is</T>
+        <Dot x={150} y={780} />
+        <D d={STRAIGHT} dur={2.2} delay={0.5} until={1} />
+        <Icon name="flag" x={1484} y={192} size={0.8} delay={2.5} speed={0.5} />
+        <D d={TANGLE} at={1} dur={5} delay={0.9} />
       </>
     ),
   },
