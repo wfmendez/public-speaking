@@ -1,0 +1,107 @@
+:root {
+  --paper: #f5f0e6;
+  --ink: #2c2a27;
+  --soft: #cfc7b8;
+  --accent: #d2702f;
+  --ease: cubic-bezier(0.33, 0.1, 0.25, 1);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  height: 100%;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+  cursor: none;
+  user-select: none;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(255, 255, 255, 0.55), transparent 70%),
+    var(--paper);
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  font-family: 'Caveat', cursive;
+}
+
+.slide { animation: slide-in 0.6s var(--ease) both; }
+@keyframes slide-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* strokes that draw themselves */
+.draw {
+  fill: none;
+  stroke: var(--ink);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1.001;
+  stroke-dashoffset: 1.001;
+  stroke-opacity: 0;
+  transition:
+    stroke-dashoffset var(--dur) var(--ease) var(--delay),
+    stroke-opacity 0s linear var(--delay),
+    stroke 0.9s var(--ease),
+    opacity 0.9s var(--ease);
+}
+.draw.on { stroke-dashoffset: 0; stroke-opacity: 1; }
+.draw.accent { stroke: var(--accent); }
+.draw.soft { stroke: var(--soft); }
+.draw.dim { stroke: var(--soft); opacity: 0.55; }
+
+/* handwritten text that wipes in */
+.write {
+  fill: var(--ink);
+  clip-path: inset(-30% 101% -30% -2%);
+  transition: clip-path var(--dur) var(--ease) var(--delay);
+}
+.write.on { clip-path: inset(-30% -2% -30% -2%); }
+.write.accent { fill: var(--accent); }
+
+/* paper sheet behind the Paint sketches */
+.sheet {
+  fill: #fff;
+  filter: drop-shadow(0 6px 14px rgba(60, 45, 25, 0.16));
+}
+
+/* groups that fade in */
+.fade {
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease) var(--delay);
+}
+.fade.on { opacity: 1; }
+.fade.on.dim { opacity: 0.25; }
+
+.progress {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--accent);
+  opacity: 0.35;
+  transition: width 0.6s var(--ease);
+}
+
+.blackout {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease);
+}
+.blackout.on { opacity: 1; pointer-events: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .draw, .write, .fade, .slide {
+    transition-duration: 0.01s !important;
+    transition-delay: 0s !important;
+    animation-duration: 0.01s !important;
+  }
+}
