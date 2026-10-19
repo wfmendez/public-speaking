@@ -29,30 +29,16 @@ const Dot = ({ x, y, at = 0, delay = 0, accent }: { x: number; y: number; at?: n
 )
 
 export const slides: SlideDef[] = [
-  // 1 · Starts as blank paper while the speaker walks up; the first click draws the title
+  // 1 · Blank paper while the speaker walks up; first click shows the original Paint sketches (the joke)
   {
     steps: 1,
-    Slide: () => (
-      <>
-        <T x={800} y={390} size={104} at={1} dur={1.2}>The Importance of</T>
-        <T x={800} y={530} size={136} at={1} delay={0.9} dur={1.3} weight={600}>
-          <tspan style={{ fill: 'var(--accent)' }}>Failure</tspan> in Success
-        </T>
-        <D d="M470,575 C560,592 650,560 740,580" accent at={1} width={5} delay={2.1} dur={0.8} />
-      </>
-    ),
-  },
-
-  // 2 · The original Paint sketches — the opening joke ("luckily, I'm a programmer")
-  {
-    steps: 0,
     Slide: () => (
       <>
         {([
           ['/sketches/expectation.png', 90, 250, -2.5, 0.3],
           ['/sketches/reality.png', 830, 270, 2, 1],
         ] as const).map(([src, x, y, tilt, delay]) => (
-          <G key={src} delay={delay} dur={0.7} transform={`rotate(${tilt} ${x + 340} ${y + 191})`}>
+          <G key={src} at={1} delay={delay} dur={0.7} transform={`rotate(${tilt} ${x + 340} ${y + 191})`}>
             <rect x={x - 12} y={y - 12} width={704} height={406} className="sheet" />
             <image href={src} x={x} y={y} width={680} height={382} />
           </G>
@@ -61,22 +47,29 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 3 · What people think success is → what it really is
+  // 2 · What people think success is → what it really is → the title, written over the faded tangle
   {
-    steps: 1,
+    steps: 2,
     Slide: () => (
       <>
         <T x={800} y={150} size={88} until={1}>What people think success is</T>
-        <T x={800} y={150} size={88} at={1} delay={0.4}>What success really is</T>
-        <Dot x={150} y={780} />
-        <D d={STRAIGHT} dur={2.2} delay={0.5} until={1} />
-        <Icon name="flag" x={1484} y={192} size={0.8} delay={2.5} speed={0.5} />
-        <D d={TANGLE} at={1} dur={5} delay={0.9} />
+        <T x={800} y={150} size={88} at={1} delay={0.4} until={2}>What success really is</T>
+        <G dur={0.3} until={2} dimTo={0.14}>
+          <Dot x={150} y={780} />
+          <D d={STRAIGHT} dur={2.2} delay={0.5} until={1} />
+          <Icon name="flag" x={1484} y={192} size={0.8} delay={2.5} speed={0.5} />
+          <D d={TANGLE} at={1} dur={5} delay={0.9} />
+        </G>
+        <T x={800} y={400} size={104} at={2} delay={0.6} dur={1.2}>The Importance of</T>
+        <T x={800} y={540} size={136} at={2} delay={1.5} dur={1.3} weight={600}>
+          <tspan style={{ fill: 'var(--accent)' }}>Failure</tspan> in Success
+        </T>
+        <D d="M470,585 C560,602 650,570 740,590" accent at={2} width={5} delay={2.7} dur={0.8} />
       </>
     ),
   },
 
-  // 4 · Everything was fine
+  // 3 · Everything was fine
   {
     steps: 0,
     Slide: () => (
@@ -92,7 +85,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 5 · One by one — each click breaks one thing; the last click is the aunt
+  // 4 · One by one — each click breaks one thing; the last click is the aunt
   {
     steps: 6,
     Slide: () => (
@@ -112,7 +105,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 6 · The gradual descent
+  // 5 · The gradual descent
   {
     steps: 0,
     Slide: () => (
@@ -124,7 +117,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 7 · The Dip (Seth Godin)
+  // 6 · The Dip (Seth Godin)
   {
     steps: 1,
     Slide: () => (
@@ -141,7 +134,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 8 · Grit (Angela Duckworth)
+  // 7 · Grit (Angela Duckworth)
   {
     steps: 2,
     Slide: () => (
@@ -154,7 +147,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 9 · How I climbed out
+  // 8 · How I climbed out
   {
     steps: 3,
     Slide: () => (
@@ -174,7 +167,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 10 · I didn't quit — the climb out of the Dip
+  // 9 · I didn't quit — the climb out of the Dip
   {
     steps: 1,
     Slide: () => (
@@ -192,7 +185,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 11 · What failure gave me
+  // 10 · What failure gave me
   {
     steps: 3,
     Slide: () => (
@@ -208,7 +201,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 12 · Close — back to the "true success" drawing, now it's my story
+  // 11 · Close — back to the "true success" drawing, now it's my story
   {
     steps: 1,
     Slide: () => (

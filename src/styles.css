@@ -76,7 +76,7 @@ html, body, #root {
   transition: opacity var(--dur) var(--ease) var(--delay);
 }
 .fade.on { opacity: 1; }
-.fade.on.dim { opacity: 0.25; }
+.fade.on.dim { opacity: var(--dim); }
 
 .progress {
   position: fixed;

@@ -51,13 +51,17 @@ export function T({
 
 /** A group that fades in at a step (and dims at `until`). */
 export function G({
-  at = 0, delay = 0, dur = 0.8, until, transform, children,
-}: Timing & { until?: number; transform?: string; children: ReactNode }) {
+  at = 0, delay = 0, dur = 0.8, until, dimTo = 0.25, transform, children,
+}: Timing & { until?: number; dimTo?: number; transform?: string; children: ReactNode }) {
   const on = useOn(at)
   const dim = useOn(until ?? Infinity)
   const cls = ['fade', on && 'on', dim && 'dim']
   return (
-    <g className={cls.filter(Boolean).join(' ')} transform={transform} style={timing(delay, dur)}>
+    <g
+      className={cls.filter(Boolean).join(' ')}
+      transform={transform}
+      style={{ ...timing(delay, dur), '--dim': dimTo } as CSSProperties}
+    >
       {children}
     </g>
   )

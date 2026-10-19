@@ -5,35 +5,32 @@ The *Nota* under each part is for you (Spanish): intention and tone, not to be r
 
 ---
 
-## 1 · Title — 0:00
+## 1 · Blank screen + the Paint sketches — 0:00
 
 *(The screen is blank paper while you walk up. Stand still, smile, look at the audience.)*
 
 Good morning.
-`[CLICK]` Today I want to talk about the importance of failure in success.
-
-> *Nota:* Antes de hablar, la pantalla está vacía para que todas las miradas estén en ti. Di "Good morning" mirando al público y haz clic mientras empiezas la segunda frase, así el título se dibuja mientras lo dices.
-
-## 2 · The Paint sketches — 0:08
-
 `[CLICK]`
 Honestly, for this presentation I wanted to show you something I made in Paint. *(pause — let them look and laugh, 2 seconds)*
 But as you can see, I'm not an artist. Luckily, I'm a programmer. So… version two.
 
-> *Nota:* No expliques los dibujos todavía; que solo se vean "feos". Quédate callado mientras se ríen y no te apresures. Todo el chiste no debe pasar de 15–20 segundos.
+> *Nota:* La pantalla vacía hace que todas las miradas estén en ti. No expliques los dibujos todavía; que solo se vean "feos". Quédate callado mientras se ríen. Todo el chiste no debe pasar de 15–20 segundos.
 
-## 3 · What success really is — 0:20
+## 2 · What success really is → the title — 0:15
 
 `[CLICK]`
 This is what most people think success looks like. You start here, you work hard, and you go straight up to your goal.
 
 `[CLICK]`
 And this is what success really looks like. Loops. Turns. Moments where you go backwards. *(pause)*
-I know, because this line is mine.
 
-> *Nota:* Deja que el dibujo enredado se dibuje en silencio unos segundos antes de decir "I know…".
+`[CLICK]`
+That's why today I want to talk about the importance of failure in success. *(pause)*
+Because this line… is mine.
 
-## 4 · Everything was fine — 0:45
+> *Nota:* Deja que el enredo se dibuje en silencio unos segundos. Luego haz clic: el dibujo se desvanece y el título se escribe encima mientras lo dices. El título llega como respuesta a los dibujos, no como portada.
+
+## 3 · Everything was fine — 0:45
 
 `[CLICK]`
 A few years ago, I thought my life was perfect. I was engaged. I had my own business. I was studying at university. And I had not one, but two jobs. I had savings, and a family I loved, especially my aunt, who was like a second mother to me.
@@ -41,7 +38,7 @@ Everything was fine.
 
 > *Nota:* Tono ligero, casi orgulloso. El contraste con lo que viene es lo que da fuerza.
 
-## 5 · One by one — 1:05
+## 4 · One by one — 1:05
 
 `[CLICK]`
 Then, one by one, it started to fall.
@@ -57,13 +54,13 @@ Some of these were my failures. Some just happened to me. But all of them knocke
 
 > *Nota:* A tu tía no se le pone una X: en el último clic todo lo demás se apaga, ella queda encendida y aparece una vela debajo. Ritmo rápido y seco en las cinco primeras, un clic por frase. En tu tía, baja la voz y detente de verdad. Es el momento más fuerte del speech; no lo apresures.
 
-## 6 · Every time I rose, I fell — 1:50
+## 5 · Every time I rose, I fell — 1:50
 
 `[CLICK]`
 And the hardest part was this: every time I tried to get up from one, the next one hit me harder. It wasn't one fall. It was a slow descent that lasted years.
 I had reached my Dip.
 
-## 7 · The Dip — 2:10
+## 6 · The Dip — 2:10
 
 `[CLICK]`
 Seth Godin wrote a small book called *The Dip*. He says every path worth taking has one: a long, hard stretch between the exciting start and real success. At the bottom of the Dip, you have two choices.
@@ -74,7 +71,7 @@ Godin says winners quit the wrong things fast, but they never quit the right thi
 
 > *Nota:* Aquí puedes mirar la curva y señalar con la mano el fondo del Dip.
 
-## 8 · Grit — 2:45
+## 7 · Grit — 2:45
 
 `[CLICK]`
 Angela Duckworth studied cadets, students and salespeople, looking for what predicts success. It wasn't talent. It was grit.
@@ -82,7 +79,7 @@ Angela Duckworth studied cadets, students and salespeople, looking for what pred
 `[CLICK]` Passion: knowing what really matters to you,
 `[CLICK]` plus perseverance: staying with it when it hurts.
 
-## 9 · How I climbed out — 3:10
+## 8 · How I climbed out — 3:10
 
 `[CLICK]`
 So how did I push through?
@@ -94,7 +91,7 @@ Faith. I held on to God, and to the hope that better days would come.
 
 > *Nota:* Esta es la parte que el público se puede llevar. Habla directo a ellos, no a la pantalla.
 
-## 10 · I didn't quit — 3:40
+## 9 · I didn't quit — 3:40
 
 `[CLICK]`
 I didn't quit.
@@ -105,7 +102,7 @@ Not because life became easy, but because I learned to control my emotions and m
 
 > *Nota:* Sonríe aquí. La línea naranja sube mientras hablas; deja que se dibuje.
 
-## 11 · What failure gave me — 4:10
+## 10 · What failure gave me — 4:10
 
 `[CLICK]`
 Failure gave me three things I could never have learned when everything was fine.
@@ -118,7 +115,7 @@ Even my failed business taught me exactly how to build the one I have today.
 
 > *Nota:* Este es el puente con el título: el fracaso no solo se supera, te da algo.
 
-## 12 · Close — 4:40
+## 11 · Close — 4:40
 
 `[CLICK]`
 So look at this line again. Every loop is a failure, and every loop is part of the path to the goal.
