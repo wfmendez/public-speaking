@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { StepContext } from './components/Draw'
 import { slides } from './slides'
 
@@ -48,6 +48,9 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Leave browser shortcuts alone, and ignore auto-repeat so a held clicker button can't skip slides.
+      if (e.ctrlKey || e.altKey || e.metaKey) return
+      if (e.repeat) { e.preventDefault(); return }
       const k = e.key.length === 1 ? e.key.toLowerCase() : e.key
       if (black && k !== 'b' && k !== '.') { setBlack(false); e.preventDefault(); return }
       if (NEXT.has(k)) next()
@@ -66,6 +69,15 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [next, prev, black])
 
+  // The click that brings the window back into focus should not also advance a slide.
+  const focusedAt = useRef(0)
+  useEffect(() => {
+    const onFocus = () => { focusedAt.current = Date.now() }
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+  }, [])
+  const onClick = () => { if (Date.now() - focusedAt.current > 400) next() }
+
   const { Slide } = slides[pos.slide]
   const total = slides.reduce((n, s) => n + s.steps + 1, 0)
   const done = slides.slice(0, pos.slide).reduce((n, s) => n + s.steps + 1, 0) + pos.step + 1
@@ -73,7 +85,7 @@ export default function App() {
   return (
     <main
       className="stage"
-      onClick={next}
+      onClick={onClick}
       onContextMenu={(e) => { e.preventDefault(); prev() }}
     >
       <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" className="canvas">
