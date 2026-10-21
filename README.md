@@ -11,7 +11,7 @@ The home page (`/`) lets you pick a talk:
 On the home page, use the mouse, the arrows/clicker to move between cards, and Space or Enter to open one (or press `1` / `2`).
 To get back to the home page from a talk, use the browser's back button.
 
-The design talk needs two iPhone home-screen screenshots in `public/apple/`: `before.png` (old style, 2007–2012) and `after.png` (new style, 2013+).
+The design talk needs two iPhone home-screen screenshots in `public/apple/`: `before.jpg` (old style, 2007–2012) and `after.jpg` (new style, 2013+).
 
 ## Run locally
 

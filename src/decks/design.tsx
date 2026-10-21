@@ -94,8 +94,8 @@ function Phone({
 }
 
 // Screenshots: iPhone home screen before (skeuomorphic, 841×1280) and after the 2013 redesign (746×1333).
-const BEFORE = { src: '/apple/before.png', ratio: 841 / 1280 }
-const AFTER = { src: '/apple/after.png', ratio: 746 / 1333 }
+const BEFORE = { src: '/apple/before.jpg', ratio: 841 / 1280 }
+const AFTER = { src: '/apple/after.jpg', ratio: 746 / 1333 }
 
 export const slides: SlideDef[] = [
   // 1 · Blank while the speaker walks up; first click draws the garage
