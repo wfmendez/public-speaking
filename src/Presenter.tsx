@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type TouchEvent } from 'react'
 import { StepContext } from './components/Draw'
 import type { SlideDef } from './deck'
 
@@ -78,6 +78,24 @@ export default function Presenter({ slides }: { slides: SlideDef[] }) {
   }, [])
   const onClick = () => { if (Date.now() - focusedAt.current > 400) next() }
 
+  // On phones: swipe left for the next step, right to go back (a tap still advances).
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
+  const onTouchStart = (e: TouchEvent) => {
+    const t = e.touches[0]
+    touchStart.current = { x: t.clientX, y: t.clientY }
+  }
+  const onTouchEnd = (e: TouchEvent) => {
+    const start = touchStart.current
+    touchStart.current = null
+    if (!start) return
+    const t = e.changedTouches[0]
+    const dx = t.clientX - start.x
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(t.clientY - start.y)) return
+    e.preventDefault()
+    if (dx < 0) next()
+    else prev()
+  }
+
   const { Slide } = slides[pos.slide]
   const total = slides.reduce((n, s) => n + s.steps + 1, 0)
   const done = slides.slice(0, pos.slide).reduce((n, s) => n + s.steps + 1, 0) + pos.step + 1
@@ -86,6 +104,8 @@ export default function Presenter({ slides }: { slides: SlideDef[] }) {
     <main
       className="stage"
       onClick={onClick}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
       onContextMenu={(e) => { e.preventDefault(); prev() }}
     >
       <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" className="canvas">

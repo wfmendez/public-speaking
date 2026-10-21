@@ -12,9 +12,8 @@
 
 html, body, #root {
   margin: 0;
-  height: 100%;
+  min-height: 100%;
   background: var(--paper);
-  overflow: hidden;
 }
 
 .stage {
@@ -22,6 +21,8 @@ html, body, #root {
   inset: 0;
   cursor: none;
   user-select: none;
+  overflow: hidden;
+  touch-action: pan-y pinch-zoom;
   background:
     radial-gradient(ellipse at 50% 40%, rgba(255, 255, 255, 0.55), transparent 70%),
     var(--paper);
@@ -113,7 +114,9 @@ html, body, #root {
 
 /* talk picker */
 .home {
-  min-height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
