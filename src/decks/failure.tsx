@@ -1,9 +1,6 @@
-import type { ComponentType } from 'react'
-import { D, G, T } from './components/Draw'
-import { Icon, type IconName } from './icons'
-
-/** `steps` = extra clicks inside the slide before moving on. */
-type SlideDef = { steps: number; Slide: ComponentType }
+import { D, G, T } from '../components/Draw'
+import { Dot, type SlideDef } from '../deck'
+import { Icon, type IconName } from '../icons'
 
 // Shapes traced from the user's sketches ("how people believe is success" / "true success").
 const STRAIGHT = 'M150,780 C520,730 700,610 880,470 S1250,280 1466,236'
@@ -22,11 +19,6 @@ const DESCENT =
   'M150,330 Q205,280 260,285 Q320,300 380,440 Q425,385 475,390 Q540,410 600,550 ' +
   'Q645,495 695,500 Q760,520 830,660 Q870,615 915,620 Q990,640 1080,790'
 
-const Dot = ({ x, y, at = 0, delay = 0, accent }: { x: number; y: number; at?: number; delay?: number; accent?: boolean }) => (
-  <G at={at} delay={delay} dur={0.4}>
-    <circle cx={x} cy={y} r={9} style={{ fill: accent ? 'var(--accent)' : 'var(--ink)' }} />
-  </G>
-)
 
 export const slides: SlideDef[] = [
   // 1 · Blank paper while the speaker walks up; first click shows the original Paint sketches (the joke)
