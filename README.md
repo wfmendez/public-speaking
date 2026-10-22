@@ -1,17 +1,7 @@
-# Talks — hand-drawn slides
+# The Importance of Failure in Success — Slides
 
-Hand-drawn style slides that draw themselves as you click. Built with Vite + React.
-The home page (`/`) lets you pick a talk:
-
-| Talk | Link | Script |
-|---|---|---|
-| The Importance of Failure in Success (5 min) | `/failure` | [SCRIPT-failure.md](SCRIPT-failure.md) |
-| Good Design Makes a Product Useful (3 min) | `/design` | [SCRIPT-design.md](SCRIPT-design.md) |
-
-On the home page, use the mouse, the arrows/clicker to move between cards, and Space or Enter to open one (or press `1` / `2`).
-To get back to the home page from a talk, use the browser's back button.
-
-The design talk needs two iPhone home-screen screenshots in `public/apple/`: `before.jpg` (old style, 2007–2012) and `after.jpg` (new style, 2013+).
+Hand-drawn style slides for a 5-minute speech that draw themselves as you click. Built with Vite + React.
+Opening the site goes straight to the presentation. The full speech with click cues is in [SCRIPT.md](SCRIPT.md).
 
 ## Run locally
 
@@ -58,7 +48,6 @@ Option B: push this folder to GitHub and import it at vercel.com/new. Vercel det
 
 ## Editing
 
-- Slide content and timing: `src/decks/failure.tsx`, `src/decks/design.tsx` (keep each slide at 6 words or fewer)
-- Talk list for the home page: `src/decks/index.ts`
+- Slide content and timing: `src/decks/failure.tsx` (keep each slide at 6 words or fewer)
 - Icons: `src/icons.tsx`
 - Colors and animation speed: `src/styles.css`
