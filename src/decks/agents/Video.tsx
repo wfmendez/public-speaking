@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { BPM, music, SILENT, type Mix } from './music'
+import { SONG, preloadSong, singLine, type SungLine } from './song'
 import { Bot, Html, Mono, OpenBox, Typed } from './ui'
 import { hush, LINES, preloadVoice, shout } from './voice'
 
 /**
- * The opening video (≈3 min): a music video about what agents do. It plays on its own,
- * following the beat of the generated soundtrack; every cut is placed on a beat number.
- * The story is in STORY-agents-video.md.
+ * The opening video (≈3 min): a sung music video about what agents do. It plays on its own,
+ * following the beat of the generated soundtrack; the song is sung line by line (song.json) and
+ * the lyrics light up word by word as they are sung. The story is in STORY-agents-video.md.
  */
 
 const BEAT = 60 / BPM
@@ -14,36 +15,36 @@ export const SONG_BEATS = 336 // 84 bars
 
 // where each part of the song starts (in beats)
 const PARTS = [0, 32, 96, 128, 192, 256, 288, 312]
+const PART_NAMES = ['intro', 'verse 1 · monday', 'pre-chorus · the chatbot', 'chorus · the agent', 'verse 2 · watch it work', 'chorus 2 · done', 'bridge', 'final · you']
+const ROOMS = ['#monday', '#monday', 'chat · just now', '#agent', 'trip_prague.md', '#done', '…', '#you']
 
-const FULL: Mix['layers'] = { kick: 1, hat: 1, clap: 0.8, bass: 1, pad: 1, arp: 0.5, stab: 0.6, lead: 0.9 }
+// no synth lead in the video: the voice sings the melody
+const FULL: Mix['layers'] = { kick: 1, hat: 1, clap: 0.8, bass: 1, pad: 1, arp: 0.5, stab: 0.6 }
 type Cue = { at: number; mix?: Mix; cut?: boolean; fx?: 'impact' | 'riser' | 'whoosh' }
 const CUES: Cue[] = [
-  { at: 0, mix: { layers: { pad: 1, kick: 0.5 }, level: 0.4, cutoff: 1600, half: true }, cut: true },
-  { at: 16, mix: { layers: { pad: 1, kick: 0.6, hat: 0.5 }, level: 0.42, cutoff: 2600, half: true } },
-  { at: 32, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1 }, level: 0.45, cutoff: 5000 }, fx: 'whoosh' },
-  { at: 64, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1, clap: 0.8, arp: 0.6 }, level: 0.48, cutoff: 8000 } },
-  { at: 96, mix: { layers: { pad: 1, arp: 0.5, hat: 0.4 }, level: 0.4, cutoff: 900 }, fx: 'whoosh' },
-  { at: 128, mix: { layers: FULL, level: 0.55, cutoff: 18000 }, cut: true, fx: 'impact' },
-  { at: 192, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1, arp: 1, lead: 0.4 }, level: 0.46, cutoff: 7000 }, fx: 'whoosh' },
-  { at: 256, mix: { layers: FULL, level: 0.6, cutoff: 18000 }, cut: true, fx: 'impact' },
+  { at: 0, mix: { layers: { pad: 1, kick: 0.5 }, level: 0.36, cutoff: 1600, half: true }, cut: true },
+  { at: 16, mix: { layers: { pad: 1, kick: 0.6, hat: 0.5 }, level: 0.38, cutoff: 2600, half: true } },
+  { at: 32, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1 }, level: 0.4, cutoff: 5000 }, fx: 'whoosh' },
+  { at: 64, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1, clap: 0.8, arp: 0.5 }, level: 0.42, cutoff: 8000 } },
+  { at: 96, mix: { layers: { pad: 1, arp: 0.5, hat: 0.4 }, level: 0.36, cutoff: 900 }, fx: 'whoosh' },
+  { at: 128, mix: { layers: FULL, level: 0.5, cutoff: 18000 }, cut: true, fx: 'impact' },
+  { at: 192, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1, arp: 0.8 }, level: 0.42, cutoff: 7000 }, fx: 'whoosh' },
+  { at: 256, mix: { layers: FULL, level: 0.52, cutoff: 18000 }, cut: true, fx: 'impact' },
   { at: 288, mix: SILENT, cut: true },
-  { at: 312, mix: { layers: FULL, level: 0.6, cutoff: 18000 }, cut: true, fx: 'impact' },
-  { at: 328, mix: { layers: { pad: 1, hat: 0.5, arp: 0.35 }, level: 0.25, cutoff: 1500 } },
+  { at: 312, mix: { layers: FULL, level: 0.52, cutoff: 18000 }, cut: true, fx: 'impact' },
+  { at: 328, mix: { layers: { pad: 1, hat: 0.5, arp: 0.35, lead: 0.5 }, level: 0.25, cutoff: 1500 } },
 ]
 
-/**
- * DJ effects placed exactly on the audio clock (scheduled a beat ahead):
- * a build (riser + snare roll) before each drop, and crash + air horn on the drops.
- */
-type Fx = { at: number; fx: 'build' | 'drop' | 'horn' }
+/** Effects placed exactly on the audio clock (scheduled a beat ahead): a build (riser + snare roll) and a crash on each drop. */
+type Fx = { at: number; fx: 'build' | 'drop' }
 const FX: Fx[] = [
   { at: 120, fx: 'build' }, { at: 128, fx: 'drop' },
   { at: 248, fx: 'build' }, { at: 256, fx: 'drop' },
-  { at: 312, fx: 'drop' }, { at: 330, fx: 'horn' },
+  { at: 312, fx: 'drop' },
 ]
 
 /**
- * The song position in beats (quarter-beat steps), on the audio clock when there is sound.
+ * The song position in beats (eighth-beat steps), on the audio clock when there is sound.
  * For rehearsal, `?from=128` in the address starts the video at that beat.
  */
 function useSongBeat(running: boolean) {
@@ -58,7 +59,7 @@ function useSongBeat(running: boolean) {
     const tick = () => {
       const audio = music.songBeat()
       const b = Math.max(0, audio === null ? (performance.now() - t0) / 1000 / BEAT : audio)
-      const q = Math.min(Math.floor(b * 4) / 4, SONG_BEATS)
+      const q = Math.min(Math.floor(b * 8) / 8, SONG_BEATS)
       if (q !== last) { last = q; setBeat(q) }
       if (q < SONG_BEATS) raf = requestAnimationFrame(tick)
     }
@@ -68,36 +69,67 @@ function useSongBeat(running: boolean) {
   return beat
 }
 
+// ---------- the sung lyrics ----------
+
+/** Where the lyrics are written, from a beat on (null = the picture already says it). `hot` lights the sung word pink. */
+type Slot = { x: number; y: number; w: number; size: number; center?: boolean; hot?: boolean } | null
+const SLOTS: [number, Slot][] = [
+  [0, { x: 100, y: 260, w: 880, size: 110 }],
+  [32, { x: 100, y: 280, w: 840, size: 96 }],
+  [80, { x: 100, y: 250, w: 860, size: 128, hot: true }],
+  [96, { x: 100, y: 300, w: 660, size: 104 }],
+  [116, { x: 100, y: 150, w: 960, size: 108, hot: true }],
+  [128, { x: 100, y: 190, w: 1400, size: 150, center: true }],
+  [136, null], // the verbs slam in on their own
+  [160, { x: 100, y: 180, w: 600, size: 96 }],
+  [192, { x: 100, y: 330, w: 660, size: 80 }],
+  [240, { x: 100, y: 180, w: 700, size: 96 }],
+  [256, { x: 100, y: 640, w: 1400, size: 90 }],
+  [288, null], // "Done ✓" glitches by itself
+  [294, { x: 100, y: 330, w: 1400, size: 150, center: true, hot: true }],
+  [312, { x: 100, y: 250, w: 1400, size: 300, center: true }],
+  [316, { x: 100, y: 230, w: 1300, size: 170 }],
+  [324, null], // the title types itself
+]
+const slotAt = (b: number) => SLOTS.filter(([at]) => at <= b).pop()?.[1] ?? null
+
+/** The line being sung: from its first word until the next line (or a few beats after its last note). */
+function lineAt(b: number): SungLine | null {
+  const i = SONG.findIndex((l, k) => l.at <= b && (k === SONG.length - 1 || SONG[k + 1].at > b))
+  return i >= 0 && b < SONG[i].end + 3 ? SONG[i] : null
+}
+
+/** Karaoke: each word appears as it is sung and the word being sung lights up. */
+function Karaoke({ line, b, slot }: { line: SungLine; b: number; slot: NonNullable<Slot> }) {
+  const now = line.words.filter((w) => w.at <= b).length - 1
+  return (
+    <div
+      className={`karaoke absolute font-extrabold leading-[1.02] tracking-[-0.04em] ${slot.hot ? 'hot' : ''}`}
+      style={{ left: slot.x, top: slot.y, width: slot.w, fontSize: slot.size, textAlign: slot.center ? 'center' : 'left' }}
+    >
+      {line.words.map((w, i) => (
+        <Fragment key={i}>
+          <span className={`w ${i === now ? 'now' : ''}`} style={{ visibility: i <= now ? 'visible' : 'hidden' }}>{w.text}</span>
+          {i < line.words.length - 1 && ' '}
+        </Fragment>
+      ))}
+    </div>
+  )
+}
+
 // ---------- pieces ----------
 
 const H = 'font-extrabold leading-[0.95] tracking-[-0.04em]'
-const PINK = 'text-bot [text-shadow:0_0_28px_rgba(255,93,143,0.55)]'
 
-/** A headline that types itself when it appears. */
-const Head = ({ text, className, hl }: { text: string; className: string; hl?: string }) => (
-  <Typed key={text} text={text} speed={32} hl={hl} className={`absolute ${H} ${className}`} />
-)
-
-const Caret = ({ className }: { className: string }) => (
-  <span className={`absolute inline-block w-0 ${className}`}><span className="caret" /></span>
-)
-
-/** A white UI card (the "real life" things the agent deals with). */
+/** A dark app panel (the "real life" things the agent deals with). */
 const Card = ({ label, children, className = '', style }: { label: string; children: ReactNode; className?: string; style?: CSSProperties }) => (
-  <div className={`absolute w-[400px] rounded-2xl border-2 border-ink/15 bg-snow p-6 text-ink shadow-[0_24px_60px_rgba(5,10,60,0.45)] ${className}`} style={style}>
-    <Mono className="mb-3 border-b-2 border-ink/10 pb-2 text-[17px] text-ink/50">{label}</Mono>
+  <div className={`absolute w-[400px] rounded-2xl border border-snow/15 bg-[#12161d] p-6 text-snow shadow-[0_30px_90px_rgba(0,0,0,0.55)] ${className}`} style={style}>
+    <Mono className="mb-3 border-b border-snow/10 pb-2 text-[17px] text-snow/50">{label}</Mono>
     {children}
   </div>
 )
 
-const CHAOS = [
-  { at: 32, head: '*47* emails.' },
-  { at: 40, head: 'a trip to *plan.*' },
-  { at: 48, head: 'homework due *Friday.*' },
-  { at: 56, head: 'a game to *build.*' },
-  { at: 64, head: '*3* group chats.' },
-  { at: 72, head: '*1* dentist appointment.' },
-]
+const CHAOS_AT = [32, 40, 48, 56, 64, 72]
 const PILE: [number, number, number][] = [[1020, 140, -4], [1090, 240, 5], [990, 320, -6], [1070, 410, 3], [1000, 500, -3], [1090, 580, 6]]
 
 function ChaosCard({ i, b }: { i: number; b: number }) {
@@ -112,7 +144,7 @@ function ChaosCard({ i, b }: { i: number; b: number }) {
     )
     case 1: return (
       <Card label="Trip · Prague" className="drop" style={style}>
-        <svg width="350" height="70"><path d="M15,50 C110,-10 240,90 335,20" fill="none" stroke="#121845" strokeWidth="4" strokeDasharray="10 10" /><circle cx="15" cy="50" r="9" fill="#121845" /><circle cx="335" cy="20" r="9" fill="#ff5d8f" /></svg>
+        <svg width="350" height="70"><path d="M15,50 C110,-10 240,90 335,20" fill="none" stroke="#f3f6ff" strokeWidth="4" strokeDasharray="10 10" /><circle cx="15" cy="50" r="9" fill="#f3f6ff" /><circle cx="335" cy="20" r="9" fill="#ff5d8f" /></svg>
         <div className={mono}>SAT → SUN · €??</div>
       </Card>
     )
@@ -120,7 +152,7 @@ function ChaosCard({ i, b }: { i: number; b: number }) {
       <Card label="Homework" className="drop" style={style}>
         <div className="flex gap-2">
           {['MON', 'TUE', 'WED', 'THU', 'FRI'].map((d) => (
-            <div key={d} className={`flex-1 rounded-lg border-2 py-2 text-center font-mono text-[18px] ${d === 'FRI' ? 'border-bot bg-bot text-snow' : 'border-ink/20'}`}>{d}</div>
+            <div key={d} className={`flex-1 rounded-lg border-2 py-2 text-center font-mono text-[18px] ${d === 'FRI' ? 'border-bot bg-bot text-snow' : 'border-snow/20'}`}>{d}</div>
           ))}
         </div>
         <div className={`${mono} mt-2 text-bot`}>due friday!</div>
@@ -128,7 +160,7 @@ function ChaosCard({ i, b }: { i: number; b: number }) {
     )
     case 3: return (
       <Card label="game.js" className="drop" style={style}>
-        <div className={`${mono} text-[22px]`}>function party() {'{'}<br />&nbsp;&nbsp;<span className="text-ink/45">// TODO: everything</span><br />{'}'}</div>
+        <div className={`${mono} text-[22px]`}>function party() {'{'}<br />&nbsp;&nbsp;<span className="text-snow/45">// TODO: everything</span><br />{'}'}</div>
       </Card>
     )
     case 4: return (
@@ -178,18 +210,18 @@ const VERBS = ['searches', 'plans', 'books', 'writes', 'tests', 'checks']
 const LOOP_POS: [string, number, number][] = [['Goal', 1050, 250], ['Plan', 1320, 520], ['Act', 1050, 790], ['Check', 780, 520]]
 
 function LoopDiagram({ b }: { b: number }) {
-  const active = Math.floor(b) % 4
-  const a = ((b % 4) / 4) * Math.PI * 2 - Math.PI / 2
+  const active = Math.floor(b / 2) % 4
+  const a = ((b % 8) / 8) * Math.PI * 2 - Math.PI / 2
   return (
     <>
       <svg width="1600" height="900" className="pop absolute left-0 top-0">
-        <circle cx="1050" cy="520" r="250" fill="none" stroke="rgba(243,246,255,0.7)" strokeWidth="4" />
-        <circle cx="1050" cy="520" r="232" fill="none" stroke="rgba(243,246,255,0.2)" strokeWidth="2" />
+        <circle cx="1050" cy="520" r="250" fill="none" stroke="rgba(243,246,255,0.5)" strokeWidth="3" />
+        <circle cx="1050" cy="520" r="232" fill="none" stroke="rgba(243,246,255,0.15)" strokeWidth="2" />
         <circle cx={1050 + Math.cos(a) * 250} cy={520 + Math.sin(a) * 250} r="16" fill="#3dffc8" />
       </svg>
       {LOOP_POS.map(([name, x, y], i) => (
         <div key={name} className="absolute -translate-x-1/2 -translate-y-1/2 rounded-xl border-2 px-6 py-1 text-[62px] font-extrabold transition-all duration-150"
-          style={{ left: x, top: y, background: i === active ? '#3dffc8' : '#0d1660', color: i === active ? '#0d1660' : '#f3f6ff', borderColor: i === active ? '#3dffc8' : 'rgba(243,246,255,0.6)', transform: `translate(-50%,-50%) scale(${i === active ? 1.12 : 1})` }}>
+          style={{ left: x, top: y, background: i === active ? '#3dffc8' : '#12161d', color: i === active ? '#0b0d11' : '#f3f6ff', borderColor: i === active ? '#3dffc8' : 'rgba(243,246,255,0.35)', transform: `translate(-50%,-50%) scale(${i === active ? 1.12 : 1})` }}>
           {name}
         </div>
       ))}
@@ -205,23 +237,23 @@ const MEMORY = ['vegetarian', 'trains > buses', 'no 6 AM alarms']
 function Console({ b }: { b: number }) {
   const total = Math.min(142, Math.max(0, Math.floor((b - 228) * 24)))
   return (
-    <div className="absolute left-[820px] top-[150px] w-[680px] rounded-2xl border-2 border-ink/15 bg-snow p-8 text-ink shadow-[0_24px_60px_rgba(5,10,60,0.45)] transition-opacity duration-500" style={{ opacity: b >= 240 ? 0 : 1 }}>
-      <Mono className="mb-4 border-b-2 border-ink/10 pb-2 text-[18px] text-green">Agent · trip_prague.md</Mono>
-      <div className="font-mono text-[18px] text-ink/45">GOAL</div>
+    <div className="absolute left-[820px] top-[150px] w-[680px] rounded-2xl border border-snow/15 bg-[#12161d] p-8 text-snow shadow-[0_30px_90px_rgba(0,0,0,0.55)] transition-opacity duration-500" style={{ opacity: b >= 240 ? 0 : 1 }}>
+      <Mono className="mb-4 border-b border-snow/10 pb-2 text-[18px] text-mint">Agent · trip_prague.md</Mono>
+      <div className="font-mono text-[18px] text-snow/45">GOAL</div>
       <Typed text="weekend in Prague, under €150" speed={30} className="mb-4 font-mono text-[30px]" />
-      {b >= 200 && <div className="font-mono text-[18px] text-ink/45">PLAN</div>}
+      {b >= 200 && <div className="font-mono text-[18px] text-snow/45">PLAN</div>}
       {PLAN.map((p, i) => b >= 200 + i * 4 && (
         <div key={p} className="pop font-mono text-[30px] leading-[1.5]">
-          <span className={b >= 216 + i * 4 ? 'text-green' : 'text-ink/30'}>{b >= 216 + i * 4 ? '[✓]' : '[ ]'}</span> {p}
+          <span className={b >= 216 + i * 4 ? 'text-mint' : 'text-snow/30'}>{b >= 216 + i * 4 ? '[✓]' : '[ ]'}</span> {p}
         </div>
       ))}
       <div className="mt-4 flex gap-3">
-        {TOOLS.map((t, i) => b >= 212 + i * 4 && <span key={t} className="pop rounded-lg bg-[#0d1660] px-4 py-1 font-mono text-[22px] uppercase tracking-[0.12em] text-mint">{t}</span>)}
+        {TOOLS.map((t, i) => b >= 212 + i * 4 && <span key={t} className="pop rounded-lg border border-mint/40 bg-mint/10 px-4 py-1 font-mono text-[22px] uppercase tracking-[0.12em] text-mint">{t}</span>)}
       </div>
       {b >= 228 && (
-        <div className="pop mt-5 flex items-baseline justify-between border-t-2 border-ink/10 pt-3">
-          <span className="font-mono text-[26px] text-ink/50">TOTAL</span>
-          <span className={`text-[72px] font-extrabold ${total === 142 ? 'text-green' : ''}`}>€{total}{total === 142 && ' ✓'}</span>
+        <div className="pop mt-5 flex items-baseline justify-between border-t border-snow/10 pt-3">
+          <span className="font-mono text-[26px] text-snow/50">TOTAL</span>
+          <span className={`text-[72px] font-extrabold ${total === 142 ? 'text-mint' : ''}`}>€{total}{total === 142 && ' ✓'}</span>
         </div>
       )}
     </div>
@@ -229,44 +261,47 @@ function Console({ b }: { b: number }) {
 }
 
 function DoneCard({ i, b }: { i: number; b: number }) {
-  const style = { left: 110, top: 250, '--r': `${i % 2 ? 3 : -3}deg` } as CSSProperties
+  const style = { left: 110, top: 220, '--r': `${i % 2 ? 3 : -3}deg` } as CSSProperties
   const mono = 'font-mono text-[30px] leading-[1.6]'
   switch (i) {
     case 0: return <Card key={i} label="Inbox" className="drop w-[540px]" style={style}><div className="text-[110px] font-extrabold leading-none">{Math.max(0, 47 - Math.floor((b - 256) * 12))}</div><div className={mono}>unread · replies drafted</div></Card>
     case 1: return <Card key={i} label="Calendar" className="drop w-[540px]" style={style}>{['MON  gym', 'TUE  study', 'FRI  homework ✓'].map((r) => <div key={r} className={mono}>{r}</div>)}</Card>
     case 2: return <Card key={i} label="Homework" className="drop w-[540px]" style={style}><div className={mono}>5 sources</div><div className={mono}>summary ready ✓</div></Card>
-    default: return <Card key={i} label="game.js" className="drop w-[540px]" style={style}><div className={mono}>tests: 12 / 12</div><div className={`${mono} text-green`}>passing ✓</div></Card>
+    default: return <Card key={i} label="game.js" className="drop w-[540px]" style={style}><div className={mono}>tests: 12 / 12</div><div className={`${mono} text-mint`}>passing ✓</div></Card>
   }
 }
 
-/** Pixel-block burst on every new part of the song. */
-function Burst() {
-  const cells = useMemo(() => Array.from({ length: 144 }, () => ({
-    color: Math.random() < 0.5 ? 'transparent' : ['#2a40e0', '#3dffc8', '#0b1250', '#d3dcff', '#ff5d8f'][Math.floor(Math.random() * 5)],
-    delay: Math.random() * 0.2,
-  })), [])
-  return <div className="pixels">{cells.map((c, i) => <i key={i} style={{ background: c.color, animationDelay: `${c.delay}s` }} />)}</div>
+/** Soft out-of-focus lights drifting behind everything. */
+function Bokeh() {
+  const lights = useMemo(() => Array.from({ length: 16 }, (_, i) => ({
+    left: (i * 397) % 1600, top: (i * 251 + 60) % 900, size: 14 + ((i * 37) % 46),
+    background: ['rgba(61,255,200,0.16)', 'rgba(255,93,143,0.13)', 'rgba(243,246,255,0.1)'][i % 3],
+    '--d': `${9 + (i % 5) * 3}s`, '--x': `${((i * 53) % 90) - 45}px`, '--y': `${((i * 71) % 70) - 35}px`,
+  }) as CSSProperties), [])
+  return <div className="bokeh pointer-events-none absolute inset-0">{lights.map((s, i) => <i key={i} style={s} />)}</div>
 }
 
-/** Giant outlined words sliding behind everything, two rows in opposite directions. */
-function Marquee({ word }: { word: string }) {
-  const row = Array.from({ length: 6 }, () => word).join(' · ') + ' · '
-  const cls = 'whitespace-nowrap text-[230px] font-extrabold leading-none tracking-[-0.03em] text-transparent [-webkit-text-stroke:2px_rgba(243,246,255,0.13)]'
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className={`marquee absolute top-[90px] ${cls}`}>{row}{row}</div>
-      <div className={`marquee reverse absolute top-[560px] ${cls}`}>{row}{row}</div>
-    </div>
-  )
-}
+/** Slices of colour sweep across on every new part of the song. */
+const Slices = () => (
+  <div className="slices">{Array.from({ length: 9 }, (_, i) => <i key={i} style={{ background: ['#3dffc8', '#0b0d11', '#f3f6ff'][(i * 2) % 3], animationDelay: `${((i * 5) % 9) * 0.022}s` }} />)}</div>
+)
 
-/** An equalizer along the bottom edge, bouncing at the tempo. */
-function Equalizer() {
+/** The bars along the top and bottom, like the screen of an app: what part we're in and how the day is going. */
+function Hud({ b, part }: { b: number; part: number }) {
+  // the trip is done at 234, then one task per hit of chorus 2; the dentist is still yours to call
+  const done = (b >= 234 ? 1 : 0) + (b < 256 ? 0 : Math.min(4, Math.floor((b - 256) / 8) + 1))
+  const open = CHAOS_AT.filter((a) => a <= b).length - done
+  const you = b >= 312
   return (
-    <div className="pointer-events-none absolute bottom-[78px] left-[48px] flex h-[70px] w-[1504px] items-end gap-[6px] opacity-60">
-      {Array.from({ length: 64 }, (_, i) => (
-        <i key={i} className="meter block flex-1 rounded-t-sm" style={{ height: `${30 + ((i * 37) % 70)}%`, background: i % 7 === 3 ? '#ff5d8f' : '#3dffc8', animationDelay: `${((i * 53) % 27) / 100}s`, animationDuration: `${0.18 + ((i * 29) % 20) / 100}s` }} />
-      ))}
+    <div className="pointer-events-none absolute inset-0 font-mono text-[16px] uppercase tracking-[0.16em] text-snow/50">
+      <div className="absolute inset-x-[48px] top-[30px] flex justify-between border-b border-snow/15 pb-3">
+        <span><b className="font-bold text-snow">Everyday AI Agents</b> · {PART_NAMES[part]}</span>
+        <span>tasks open: {open} · done by agent: <span className="text-mint">{done}</span> · decided by: <span className={you ? 'text-mint' : ''}>{you ? 'you' : '?'}</span></span>
+      </div>
+      <div className="absolute inset-x-[48px] bottom-[28px] flex justify-between">
+        <span>{ROOMS[part]}</span>
+        <span>♪ {BPM} bpm · BOT-001 online</span>
+      </div>
     </div>
   )
 }
@@ -288,59 +323,49 @@ function Pulse({ children }: { children: ReactNode }) {
 function Frame({ b }: { b: number }) {
   const in_ = (a: number, z: number) => b >= a && b < z
   const part = PARTS.filter((p) => p <= b).length - 1
-  const chaos = CHAOS.filter((c) => c.at <= b)
+  const chaos = CHAOS_AT.filter((at) => at <= b)
   const verb = Math.floor((b - 136) / 4)
   const hit = Math.floor((b - 256) / 8)
+  const line = b < SONG_BEATS ? lineAt(b) : null
+  const slot = slotAt(b)
 
-  const kick = !(in_(0, 16) || in_(96, 128) || in_(288, 312)) // sections where the beat is pumping
-  const word = ['MONDAY', 'TOO MUCH', 'HELP ME', 'AGENT', 'GOAL PLAN ACT CHECK', 'DONE', '', 'YOU'][part]
   return (
     <Html>
-      {word && b < SONG_BEATS && <Marquee key={word} word={word} />}
-      {kick && b < 324 && <Equalizer />}
+      <div className="mv-dark absolute inset-0" />
+      <Bokeh />
       {[128, 256, 312].map((x) => in_(x, x + 1) && <div key={x} className="flash absolute inset-0 bg-snow" />)}
       <Pulse>
       {/* 1 · intro: it's Monday */}
-      {in_(0, 8) && <Caret className="left-[110px] top-[330px] h-[150px] text-[150px]" />}
-      {in_(8, 32) && <Head text="it's *Monday.*" className="left-[100px] top-[280px] text-[170px]" />}
-      {in_(16, 32) && <Clock ring={b >= 24} />}
-      {in_(20, 32) && <Typed text="8:00 AM." speed={60} className="absolute left-[110px] top-[480px] font-mono text-[64px] text-snow/70" />}
+      {in_(0, 8) && <span className="absolute left-[110px] top-[300px] inline-block h-[110px] w-0 text-[110px]"><span className="caret" /></span>}
+      {in_(16, 32) && <Clock ring={b >= 18} />}
+      {in_(4, 32) && <Typed text="8:00 AM." speed={60} className="absolute left-[110px] top-[560px] font-mono text-[56px] text-snow/60" />}
 
       {/* 2 · verse: the chaos piles up */}
       {in_(32, 128) && (
-        <div className={b >= 80 && b < 96 ? 'shake' : ''} style={{ opacity: b >= 96 ? 0.22 : 1, transition: 'opacity 0.6s' }}>
+        <div className={b >= 80 && b < 96 ? 'shake' : ''} style={{ opacity: b >= 96 ? 0.18 : 1, transition: 'opacity 0.6s' }}>
           {chaos.map((_, i) => <ChaosCard key={i} i={i} b={b} />)}
         </div>
       )}
-      {in_(32, 80) && <Head text={chaos[chaos.length - 1]?.head ?? ''} className="left-[100px] top-[300px] w-[860px] text-[118px]" />}
-      {in_(80, 96) && <Head text="too *much.*" hl={PINK} className="left-[100px] top-[300px] text-[180px]" />}
 
       {/* 3 · pre-chorus: a chatbot only gives advice */}
-      {in_(96, 104) && <Head text="so you ask a *chatbot.*" className="left-[100px] top-[150px] w-[900px] text-[118px]" />}
       {in_(104, 116) && (
-        <div className="absolute left-[110px] top-[200px] w-[820px]">
-          <Mono className="mb-3 text-[18px] text-snow/60">Chat · just now</Mono>
-          <div className="rounded-2xl border-[3px] border-snow/80 bg-[#0d1660]/80 px-8 py-6">
-            <Typed text="help me." caret speed={90} className="font-mono text-[64px] text-mint" />
+        <div className="absolute left-[820px] top-[200px] w-[680px]">
+          <Mono className="mb-3 text-[18px] text-snow/50">Chat · just now</Mono>
+          <div className="rounded-2xl border border-snow/20 bg-[#12161d] px-8 py-6">
+            <Typed text="help me." caret speed={90} className="font-mono text-[60px] text-mint" />
           </div>
           {b >= 108 && (
             <div className="pop mt-8 flex items-end gap-5">
               <Bot px={8} />
-              <div className="rounded-2xl rounded-bl-sm bg-snow px-7 py-4 text-[40px] text-ink">Here are 5 tips for your week…</div>
+              <div className="rounded-2xl rounded-bl-sm bg-snow px-7 py-4 text-[38px] text-ink">Here are 5 tips for your week…</div>
             </div>
           )}
         </div>
       )}
-      {in_(116, 128) && <Head text="…the work is still *yours.*" hl={PINK} className="left-[100px] top-[150px] w-[960px] text-[118px]" />}
       {in_(116, 128) && <StickFigure />}
 
       {/* 4 · chorus: meet your agent */}
-      {in_(128, 136) && (
-        <>
-          <Head text="meet your *agent.*" className="inset-x-0 top-[200px] text-center text-[150px]" />
-          <div className="pop absolute left-[730px] top-[540px]"><div className="hop"><Bot px={16} /></div></div>
-        </>
-      )}
+      {in_(128, 136) && <div className="pop absolute left-[730px] top-[540px]"><div className="hop"><Bot px={16} /></div></div>}
       {in_(136, 160) && (
         <div key={verb} className="slam absolute inset-x-0 top-[250px] text-center">
           <Mono className="mb-4 text-mint">Tool call 0{verb + 1} / 06</Mono>
@@ -348,55 +373,33 @@ function Frame({ b }: { b: number }) {
         </div>
       )}
       {in_(136, 160) && <div className="hop absolute left-[120px] top-[700px]"><Bot px={9} /></div>}
-      {in_(160, 192) && (
-        <>
-          <Head text={'on\n*repeat.*'} className="left-[100px] top-[180px] text-[128px]" />
-          <LoopDiagram b={b} />
-        </>
-      )}
+      {in_(160, 192) && <LoopDiagram b={b} />}
 
       {/* 5 · verse 2: watch it work (one task up close) */}
-      {in_(192, 240) && (
-        <div className="absolute left-[110px] top-[300px]">
-          {(['Goal', 'Plan', 'Act', 'Check'] as const).map((s, i) => {
-            const from = [192, 200, 212, 228][i]
-            const to = [200, 212, 228, 240][i]
-            return in_(from, to) && (
-              <div key={s}>
-                <Mono className="mb-2 text-mint">Step 0{i + 1} / 04</Mono>
-                <Typed text={`*${s}.*`} speed={50} className={`${H} text-[180px]`} />
-              </div>
-            )
-          })}
-        </div>
-      )}
+      {in_(192, 240) && (['Goal', 'Plan', 'Act', 'Check'] as const).map((s, i) => {
+        const from = [192, 200, 212, 228][i]
+        return in_(from, [200, 212, 228, 240][i]) && <Mono key={s} className="pop absolute left-[110px] top-[270px] text-mint">Step 0{i + 1} / 04 · {s}</Mono>
+      })}
       {in_(192, 256) && <Console b={b} />}
       {in_(240, 256) && (
-        <>
-          <Head text={'it\n*remembers*\nyou.'} className="left-[100px] top-[180px] text-[128px]" />
-          <div className="absolute left-[860px] top-[300px] flex flex-col items-start gap-6">
-            {MEMORY.map((m, i) => b >= 242 + i * 4 && <span key={m} className="pop rounded-xl border-2 border-mint bg-[#0d1660] px-8 py-3 font-mono text-[48px] text-mint">+ {m}</span>)}
-          </div>
-        </>
+        <div className="absolute left-[860px] top-[300px] flex flex-col items-start gap-6">
+          {MEMORY.map((m, i) => b >= 242 + i * 4 && <span key={m} className="pop rounded-xl border-2 border-mint bg-[#12161d] px-8 py-3 font-mono text-[48px] text-mint">+ {m}</span>)}
+        </div>
       )}
 
       {/* 6 · chorus 2: everything done */}
       {in_(256, 288) && (
         <>
           <DoneCard key={hit} i={hit} b={b} />
-          <div key={Math.floor(b)} className="thump absolute left-[740px] top-[300px] text-[220px] font-extrabold leading-none tracking-[-0.04em] text-mint [text-shadow:0_0_50px_rgba(61,255,200,0.6)]">Done ✓</div>
+          <div key={Math.floor(b)} className="thump absolute left-[740px] top-[260px] text-[220px] font-extrabold leading-none tracking-[-0.04em] text-mint [text-shadow:0_0_50px_rgba(61,255,200,0.6)]">Done ✓</div>
         </>
       )}
 
       {/* 7 · bridge: the music stops */}
       {in_(288, 294) && <div className={`absolute inset-x-0 top-[330px] text-center text-[220px] ${H} text-mint ${b >= 291 ? 'glitchy' : ''}`}>Done ✓</div>}
-      {in_(294, 302) && <Head text="…but is it *right?*" hl={PINK} className="inset-x-0 top-[330px] text-center text-[150px]" />}
-      {in_(302, 308) && <Head text="…who *decides?*" hl={PINK} className="inset-x-0 top-[330px] text-center text-[150px]" />}
-      {in_(308, 312) && <Caret className="left-[790px] top-[360px] h-[150px] text-[150px]" />}
+      {in_(310, 312) && <span className="absolute left-[790px] top-[360px] inline-block h-[150px] w-0 text-[150px]"><span className="caret" /></span>}
 
       {/* 8 · final: you do */}
-      {in_(312, 316) && <div className="pop absolute inset-x-0 top-[260px] text-center"><span className={`${H} text-[300px]`}>You <span className="text-mint [text-shadow:0_0_50px_rgba(61,255,200,0.6)]">do.</span></span></div>}
-      {in_(316, 324) && <Head text={'Goal: *you.*\nCheck: *you.*'} className="left-[100px] top-[230px] text-[180px]" />}
       {b >= 324 && (
         <>
           <div className="pop absolute left-[110px] top-[230px]"><Mono className="text-mint">Class · Cumorah Academy</Mono></div>
@@ -405,9 +408,10 @@ function Frame({ b }: { b: number }) {
         </>
       )}
 
+      {line && slot && <Karaoke line={line} b={b} slot={slot} />}
       </Pulse>
-      {part > 0 && b < SONG_BEATS && <Burst key={part} />}
-      {b < SONG_BEATS && Math.floor(b) % 16 === 0 && b >= 16 && !in_(288, 312) && <Burst key={`bar${Math.floor(b)}`} />}
+      {b < SONG_BEATS && <Hud b={b} part={part} />}
+      {part > 0 && b < SONG_BEATS && <Slices key={part} />}
     </Html>
   )
 }
@@ -418,20 +422,25 @@ export default function OpeningVideo({ step, onEnd }: { step: number; onEnd: () 
   const beat = useSongBeat(running)
   const fired = useRef(-1)
   const sung = useRef(-1)
+  const said = useRef(-1)
   const fxDone = useRef(-1)
   const ended = useRef(false)
 
-  // download the voice clips as soon as the slide is on screen; decode once sound is unlocked
-  useEffect(() => { preloadVoice() }, [])
+  // download the song and the bot's line as soon as the slide is on screen; decode once sound is unlocked
+  useEffect(() => { preloadSong(); preloadVoice() }, [])
   useEffect(() => { if (running) music.decodeAll() }, [running])
 
-  // music cues on their beats
   useEffect(() => {
-    if (!running) { fired.current = -1; sung.current = -1; fxDone.current = -1; ended.current = false; hush(); return }
-    // the DJ voice, scheduled a beat ahead so each line lands on its beat (skipped if we're already late)
-    LINES.forEach((l, i) => {
+    if (!running) { fired.current = -1; sung.current = -1; said.current = -1; fxDone.current = -1; ended.current = false; hush(); return }
+    // the sung lines (and the bot's spoken one), scheduled a beat ahead so each lands on its beat (skipped if we're already late)
+    SONG.forEach((l, i) => {
       if (i <= sung.current || l.at - 1 > beat) return
       sung.current = i
+      if (beat - l.at < 0.5) singLine(l, music.timeAt(l.at))
+    })
+    LINES.forEach((l, i) => {
+      if (i <= said.current || l.at - 1 > beat) return
+      said.current = i
       if (beat - l.at < 0.5) shout(l, music.timeAt(l.at))
     })
     FX.forEach((f, i) => {
@@ -440,8 +449,7 @@ export default function OpeningVideo({ step, onEnd }: { step: number; onEnd: () 
       if (beat > f.at) return
       const t = music.timeAt(f.at)
       if (f.fx === 'build') { music.riser(8 * BEAT); music.snareRoll(t, 8) }
-      if (f.fx === 'drop') { music.crash(t); music.airhorn(t) }
-      if (f.fx === 'horn') music.airhorn(t)
+      if (f.fx === 'drop') music.crash(t)
     })
     CUES.forEach((c, i) => {
       if (i <= fired.current || c.at > beat) return
@@ -459,8 +467,8 @@ export default function OpeningVideo({ step, onEnd }: { step: number; onEnd: () 
   const b = running ? beat : SONG_BEATS
   return (
     <>
-      {b >= 324 && <g className="pop"><OpenBox /></g>}
       <Frame b={b} />
+      {b >= 324 && <g className="pop"><OpenBox /></g>}
     </>
   )
 }

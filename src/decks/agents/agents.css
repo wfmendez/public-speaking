@@ -119,7 +119,19 @@
 .vpulse { transition: transform 0.22s ease-out; transform-origin: 50% 55%; }
 .vpulse.kick { transform: scale(1.022); transition: none; }
 
+/* opening video: a dark app screen with soft out-of-focus lights, sung lyrics lighting up word by word */
+.mv-dark { background: radial-gradient(ellipse 70% 70% at 55% 45%, #161b24 0%, #0d1015 55%, #07080b 100%); }
+.bokeh i { position: absolute; border-radius: 50%; filter: blur(6px); animation: float var(--d) ease-in-out infinite alternate; }
+@keyframes float { to { transform: translate(var(--x), var(--y)); } }
+.karaoke .w { display: inline-block; white-space: pre; }
+.karaoke .now { color: #3dffc8; text-shadow: 0 0 34px rgba(61, 255, 200, 0.6); }
+.karaoke.hot .now { color: #ff5d8f; text-shadow: 0 0 34px rgba(255, 93, 143, 0.6); }
+.slices { position: absolute; inset: 0; pointer-events: none; display: grid; grid-template-rows: repeat(9, 1fr); }
+.slices i { transform: translateX(-101%); animation: slice 0.42s cubic-bezier(0.7, 0, 0.3, 1) both; }
+@keyframes slice { 0% { transform: translateX(-101%); } 50% { transform: translateX(0); } 100% { transform: translateX(101%); } }
+
 @media (prefers-reduced-motion: reduce) {
+  .bokeh i, .slices i,
   .slam, .flash, .marquee, .drift,
   .pop, .drop, .shake, .hop, .thump, .glitchy { animation: none !important; }
   .beat, .meter, .blink, .dots i, .pixels i, .caret { animation: none !important; }

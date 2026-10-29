@@ -8,7 +8,7 @@ The home page (`/`) lists every talk made so far:
 | The Importance of Failure in Success (5 min) | `/failure` | [SCRIPT.md](SCRIPT.md) |
 | Good Design Makes a Product Useful (3 min) | `/design` | [SCRIPT-design.md](SCRIPT-design.md) |
 | Homeless to Leaders (2 min, red accent) | `/leaders` | [SCRIPT-leaders.md](SCRIPT-leaders.md) |
-| Everyday AI Agents (20 min class: a 3-min opening music video, kinetic type + 3D line art with Three.js and Tailwind, live music — M mutes; story in [STORY-agents-video.md](STORY-agents-video.md)) | `/agents` | [SCRIPT-agents.md](SCRIPT-agents.md) |
+| Everyday AI Agents (20 min class: a 3-min sung opening music video, kinetic type + 3D line art with Three.js and Tailwind, live music — M mutes; story in [STORY-agents-video.md](STORY-agents-video.md)) | `/agents` | [SCRIPT-agents.md](SCRIPT-agents.md) |
 
 On the home page, use the mouse, or the arrows/clicker to move between cards and Space/Enter to open one (or press `1`–`4`).
 To get back to the list from a talk, use the browser's back button.
@@ -63,19 +63,27 @@ Option B: push this folder to GitHub and import it at vercel.com/new. Vercel det
 - Icons: `src/icons.tsx`
 - Colors and animation speed: `src/styles.css`
 
-## Agents class: DJ voice
+## Agents class: the sung song and the voices
 
-The opening video's DJ voice is made of real recordings in `public/agents/voice/*.mp3`, generated with
-[Kokoro](https://github.com/thewh1teagle/kokoro-onnx) (open-source neural voice, runs offline). The lines,
-their beats and their effects (echo, stutter, scratch) live in `src/decks/agents/lyrics.json`.
+The opening video is a song, sung line by line in `public/agents/song/*.mp3`. Each word is said by
+[Kokoro](https://github.com/thewh1teagle/kokoro-onnx) (open-source neural voice, runs offline), then Praat
+([parselmouth](https://github.com/YannickJadoul/Parselmouth)) stretches it to its notes and moves it onto the
+melody, with vibrato, a doubled track and a harmony on the choruses. The lyrics and their melody live in
+`src/decks/agents/song.json` (`word=NOTE:beats`, e.g. `agent=A4:.5,C5:2.5`); the lyrics on screen light up
+word by word from the same notes.
 
-To change a line or the voice (`"voices": { "dj": "af_bella" }`), edit `lyrics.json` and regenerate:
+The spoken lines (the chatbot in the video, "You are the D.J.!" on the class slide) are in
+`src/decks/agents/lyrics.json` and are made by `tools/make-voice.py`.
+
+To change the song or a spoken line, edit those files and regenerate:
 
 ```bash
 python -m venv .voice-tools/env
-.voice-tools/env/Scripts/python -m pip install kokoro-onnx soundfile
+.voice-tools/env/Scripts/python -m pip install kokoro-onnx soundfile praat-parselmouth
 # put kokoro-v1.0.onnx and voices-v1.0.bin (from the kokoro-onnx "model-files-v1.0" release) in .voice-tools/
+.voice-tools/env/Scripts/python tools/make-song.py
 .voice-tools/env/Scripts/python tools/make-voice.py
 ```
 
-`--preview` renders one line in several voices into `.voice-tools/previews/`. Needs ffmpeg.
+`make-song.py --preview` also writes the whole vocal track to `.voice-tools/previews/song-vocals.wav`;
+`make-voice.py --preview` renders one line in several voices. Both need ffmpeg.

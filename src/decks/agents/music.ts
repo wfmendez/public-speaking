@@ -56,6 +56,7 @@ class Music {
   private vduck!: GainNode
   private voice!: GainNode
   private echo!: GainNode
+  private room!: GainNode
   private clips = new Map<string, Promise<ArrayBuffer | null>>()
   private decoded = new Map<string, AudioBuffer>()
   private beatListeners = new Set<() => void>()
@@ -104,6 +105,17 @@ class Music {
     tone.connect(feedback)
     feedback.connect(delay)
     tone.connect(this.voice)
+    // a room for the sung lines: a 2-second reverb made of fading noise
+    const verb = ctx.createConvolver()
+    const ir = ctx.createBuffer(2, ctx.sampleRate * 2, ctx.sampleRate)
+    for (let c = 0; c < 2; c++) {
+      const d = ir.getChannelData(c)
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length) ** 3
+    }
+    verb.buffer = ir
+    this.room = ctx.createGain()
+    this.room.connect(verb)
+    verb.connect(this.voice)
     // pad, bass and arp "pump" under the kick
     this.duck = ctx.createGain()
     this.duck.connect(this.filter)
@@ -177,9 +189,10 @@ class Music {
 
   /**
    * Plays a voice clip at audio time `when`, with an optional DJ effect:
-   * echo (repeats on the beat), stutter (the first syllable three times, "a-a-a-"), scratch (pitch wobble).
+   * echo (repeats on the beat), stutter (the first syllable three times, "a-a-a-"), scratch (pitch wobble),
+   * sing (a sung line: room reverb).
    */
-  playClip(url: string, when: number, fx?: 'echo' | 'stutter' | 'scratch') {
+  playClip(url: string, when: number, fx?: 'echo' | 'stutter' | 'scratch' | 'sing') {
     const ctx = this.ctx
     const buf = this.decoded.get(url)
     if (!ctx || !buf || this.muted) return false
@@ -212,10 +225,16 @@ class Music {
       r.linearRampToValueAtTime(0.5, t + 0.2)
       r.linearRampToValueAtTime(1, t + 0.28)
     }
+    if (fx === 'sing') {
+      const send = ctx.createGain()
+      send.gain.value = 0.3
+      out.connect(send)
+      send.connect(this.room)
+    }
     src.start(t)
-    // duck the music under the voice
+    // duck the music under the voice (only a little under singing, so the song doesn't pump)
     const g = this.vduck.gain
-    g.setTargetAtTime(0.5, t, 0.03)
+    g.setTargetAtTime(fx === 'sing' ? 0.8 : 0.5, t, 0.03)
     g.setTargetAtTime(1, t + buf.duration, 0.2)
     return true
   }
