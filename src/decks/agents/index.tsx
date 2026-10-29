@@ -1,222 +1,375 @@
-import '@fontsource/space-grotesk/400.css'
-import '@fontsource/space-grotesk/600.css'
-import '@fontsource/space-grotesk/700.css'
-import '@fontsource/bungee/400.css'
+import '@fontsource/inter-tight/500.css'
+import '@fontsource/inter-tight/700.css'
+import '@fontsource/inter-tight/800.css'
+import '@fontsource/jetbrains-mono/400.css'
+import '@fontsource/jetbrains-mono/700.css'
 import './agents.css'
-import { lazy, Suspense, useContext, type ReactNode } from 'react'
-import { StepContext } from '../../components/Draw'
+import { lazy, Suspense, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { D, G, StepContext } from '../../components/Draw'
 import type { SlideDef } from '../../deck'
-import { EVERYDAY, LOOP, TOOLS } from './data'
+import { BPM, music } from './music'
+import { CHROME, LOOP, mixFor, SURFACE, TOOLS, EVERYDAY } from './data'
 
 // Three.js is only downloaded when this class is opened.
 const World = lazy(() => import('./World'))
-export const AgentsWorld = (props: { slide: number; step: number }) => (
-  <Suspense fallback={null}><World {...props} /></Suspense>
-)
 
 const useStep = () => useContext(StepContext)
 
 /** HTML overlay (styled with Tailwind) inside the 1600×900 slide, so it scales with everything else. */
-const Html = ({ children }: { children: ReactNode }) => (
+const Html = ({ light, children }: { light?: boolean; children: ReactNode }) => (
   <foreignObject x={0} y={0} width={1600} height={900}>
-    <div className="relative h-[900px] w-[1600px] font-grotesk text-[#eaf2ff]">{children}</div>
+    <div className={`relative h-[900px] w-[1600px] font-tight ${light ? 'text-ink' : 'text-snow'}`}>{children}</div>
   </foreignObject>
 )
 
-/** Fades/slides in at step `at`, out at step `until`. */
-function Reveal({ at = 0, until, delay = 0, className = '', children }: {
-  at?: number; until?: number; delay?: number; className?: string; children: ReactNode
+/** Fades/slides in at step `at`, out at step `until`. `blur` arrives out of a blur instead. */
+function Reveal({ at = 0, until, delay = 0, blur, className = '', children }: {
+  at?: number; until?: number; delay?: number; blur?: boolean; className?: string; children: ReactNode
 }) {
   const step = useStep()
   const state = step >= (until ?? Infinity) ? 'out' : step >= at ? 'in' : ''
-  return <div className={`reveal ${state} ${className}`} style={{ transitionDelay: state === 'in' ? `${delay}s` : '0s' }}>{children}</div>
+  return (
+    <div className={`${blur ? 'blurin' : 'reveal'} ${state} ${className}`} style={{ transitionDelay: state === 'in' ? `${delay}s` : '0s' }}>
+      {children}
+    </div>
+  )
 }
 
-const Glass = ({ className = '', children }: { className?: string; children: ReactNode }) => (
-  <div className={`rounded-3xl border border-white/15 bg-white/[0.06] shadow-[0_0_60px_rgba(0,229,255,0.12)] backdrop-blur-md ${className}`}>{children}</div>
+type Ch = { c: string; hl: boolean; i: number }
+
+/** "Inside an *agent*" → lines of words of characters; *stars* mark the highlighted words. */
+function parse(text: string) {
+  let hl = false
+  let i = 0
+  return text.split('\n').map((line) => {
+    const words: Ch[][] = [[]]
+    for (const c of line) {
+      if (c === '*') { hl = !hl; continue }
+      if (c === ' ') { words.push([{ c, hl, i: i++ }], []); continue }
+      words[words.length - 1].push({ c, hl, i: i++ })
+    }
+    return words.filter((w) => w.length)
+  })
+}
+
+/**
+ * Kinetic type: the text types itself, letter by letter, with a block cursor.
+ * Highlighted words (between *stars*) take the `hl` colour.
+ */
+function Type({ text, at = 0, until, delay = 0, speed = 42, className = '', hl = 'text-mint [text-shadow:0_0_28px_rgba(61,255,200,0.55)]', caret = false }: {
+  text: string; at?: number; until?: number; delay?: number; speed?: number; className?: string; hl?: string; caret?: boolean
+}) {
+  const step = useStep()
+  const active = step >= at && step < (until ?? Infinity)
+  const lines = useMemo(() => parse(text), [text])
+  const total = lines.flat(2).length
+  const [n, setN] = useState(0)
+
+  useEffect(() => {
+    if (!active) { setN(0); return }
+    let i = 0
+    let timer = 0
+    const start = window.setTimeout(() => {
+      timer = window.setInterval(() => {
+        i += 1
+        setN(i)
+        if (i % 2) music.type()
+        if (i >= total) window.clearInterval(timer)
+      }, speed)
+    }, delay * 1000)
+    return () => { window.clearTimeout(start); window.clearInterval(timer) }
+  }, [active, total, delay, speed])
+
+  const showCaret = active && (n < total || caret) && (n > 0 || step >= at)
+  return (
+    <div className={className}>
+      {lines.map((words, li) => (
+        <span key={li} className="block">
+          {words.map((w) => (
+            <span key={w[0].i} className={w[0].c === ' ' ? '' : 'inline-block whitespace-pre'}>
+              {w.map(({ c, hl: h, i }) => (
+                <span key={i} className={`relative ${h ? hl : ''}`} style={{ visibility: i < n ? 'visible' : 'hidden' }}>
+                  {c}
+                  {showCaret && i === n && <span className="caret" style={{ visibility: 'visible' }} />}
+                </span>
+              ))}
+              {showCaret && n === total && w[w.length - 1].i === total - 1 && <span className="relative"><span className="caret" /></span>}
+            </span>
+          ))}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+const Mono = ({ className = '', children }: { className?: string; children: ReactNode }) => (
+  <div className={`font-mono text-[24px] uppercase tracking-[0.18em] ${className}`}>{children}</div>
 )
 
-const Kicker = ({ children }: { children: ReactNode }) => (
-  <div className="mb-4 text-[26px] font-semibold uppercase tracking-[0.35em] text-neon">{children}</div>
+// A tiny pixel robot (our own mascot). e = eye.
+const BOT = ['....x....', '..xxxxx..', '.xxxxxxx.', '.xexxxex.', '.xxxxxxx.', 'xx.xxx.xx', '..x...x..']
+
+function Bot({ px = 12, color = '#ff5d8f', className = '' }: { px?: number; color?: string; className?: string }) {
+  return (
+    <div className={`grid ${className}`} style={{ gridTemplateColumns: `repeat(9, ${px}px)`, gridAutoRows: `${px}px` }}>
+      {BOT.join('').split('').map((c, i) => (
+        <div key={i} style={{ background: c === '.' ? 'transparent' : color }}>
+          {c === 'e' && <div className="blink h-full w-full bg-[#0b1250]" />}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** UI panel used for captions over the 3D world. */
+const Panel = ({ className = '', children }: { className?: string; children: ReactNode }) => (
+  <div className={`rounded-2xl border-2 border-snow/60 bg-[#0d1660]/85 ${className}`}>{children}</div>
 )
 
-// ---------- DJ booth (SVG + CSS animation, 120 BPM) ----------
+// ---------- line art ----------
 
-function Turntable({ cx, cy }: { cx: number; cy: number }) {
+const CHANNELS = ['SEARCH', 'CALENDAR', 'EMAIL', 'CODE']
+
+/** A wireframe DJ mixer; `up` faders are pushed up (and their meters dance). */
+function Mixer({ x, y, up, at = 0 }: { x: number; y: number; up: number; at?: number }) {
   return (
     <g>
-      <rect x={cx - 190} y={cy - 170} width={380} height={340} rx={28} fill="#0e0c1f" stroke="rgba(0,229,255,0.35)" strokeWidth={3} />
-      <g className="vinyl">
-        <circle cx={cx} cy={cy} r={140} fill="#06050d" stroke="#2a2550" strokeWidth={4} />
-        {[120, 100, 80, 62].map((r) => <circle key={r} cx={cx} cy={cy} r={r} fill="none" stroke="rgba(234,242,255,0.10)" strokeWidth={2} />)}
-        <circle cx={cx} cy={cy} r={40} fill="var(--pink)" />
-        <rect x={cx - 4} y={cy - 40} width={8} height={26} fill="#06050d" />
-        <circle cx={cx} cy={cy} r={6} fill="#06050d" />
-      </g>
-      <path d={`M${cx + 150},${cy - 130} L${cx + 120},${cy + 10} L${cx + 70},${cy + 40}`} fill="none" stroke="#cfd6ff" strokeWidth={8} strokeLinecap="round" />
+      {CHANNELS.map((name, i) => {
+        const cx = x + i * 175
+        const on = up > i
+        const circle = (cy: number) => `M${cx + 70},${cy - 22} a22,22 0 1,0 0.01,0`
+        return (
+          <g key={name}>
+            <D at={at} delay={0.2 + i * 0.12} width={3} d={`M${cx},${y} H${cx + 140} V${y + 560} H${cx} Z`} />
+            <D at={at} delay={0.5 + i * 0.12} width={3} soft d={circle(y + 60)} />
+            <D at={at} delay={0.6 + i * 0.12} width={3} soft d={circle(y + 125)} />
+            <D at={at} delay={0.7 + i * 0.12} width={3} soft d={`M${cx + 70},${y + 190} V${y + 470}`} />
+            {[0, 1, 2, 3, 4, 5].map((b) => (
+              <rect
+                key={b} x={cx + 108} y={y + 440 - b * 44} width={16} height={36} rx={3}
+                className={on ? 'meter' : ''}
+                style={{ fill: b > 3 ? '#ff5d8f' : 'var(--accent)', opacity: on ? 0.9 : 0.12, animationDelay: `${(b * 0.07 + i * 0.11) % 0.27}s`, transition: 'opacity 0.4s' }}
+              />
+            ))}
+            <G at={at} delay={0.9 + i * 0.12}>
+              <g style={{ transform: `translateY(${on ? -240 : 0}px)`, transition: 'transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)' }}>
+                <rect x={cx + 35} y={y + 440} width={70} height={34} rx={6} style={{ fill: on ? 'var(--accent)' : 'var(--paper)', stroke: 'var(--ink)', strokeWidth: 3, transition: 'fill 0.4s' }} />
+              </g>
+              <text x={cx + 70} y={y + 532} textAnchor="middle" fontFamily="JetBrains Mono" fontSize={22} letterSpacing={2} style={{ fill: 'var(--ink)', opacity: on ? 1 : 0.55 }}>{name}</text>
+            </G>
+          </g>
+        )
+      })}
     </g>
   )
 }
 
-function Equalizer({ x, y, w, bars = 24, h = 160 }: { x: number; y: number; w: number; bars?: number; h?: number }) {
-  const bw = w / bars
+/** Wireframe open box: the agent, ready to be filled with tools. */
+function OpenBox() {
+  const hatch = [0.2, 0.35, 0.5, 0.65, 0.8].map((f) => {
+    const x = 1040 + f * 160
+    const yTop = 430 + f * 70
+    return `M${x},${yTop} V${yTop + 220}`
+  })
   return (
     <g>
-      {Array.from({ length: bars }, (_, i) => (
-        <rect
-          key={i} className="eq-bar" x={x + i * bw + 3} y={y - h} width={bw - 6} height={h} rx={4}
-          fill={i % 3 === 0 ? 'var(--pink)' : i % 3 === 1 ? 'var(--accent)' : 'var(--lime)'}
-          style={{ animationDelay: `${(i * 137) % 500 / 1000}s`, animationDuration: `${0.35 + ((i * 53) % 30) / 100}s`, opacity: 0.85 }}
-        />
-      ))}
+      <G at={1} delay={1.6} dimTo={1}><polygon points="1040,430 1200,360 1360,430 1200,500" style={{ fill: 'var(--accent)', opacity: 0.18 }} /></G>
+      <D at={1} delay={0.3} width={3} d="M1040,430 L1200,500 L1360,430 M1040,430 V650 L1200,720 L1360,650 V430 M1200,500 V720" />
+      <D at={1} delay={0.9} width={3} d="M1040,430 L1200,360 L1360,430" soft />
+      <D at={1} delay={1.2} width={3} d="M1040,430 L980,300 L1140,232 L1200,360" />
+      <D at={1} delay={1.4} width={3} d="M1360,430 L1450,322 L1290,252 L1200,360" />
+      {hatch.map((d, i) => <D key={d} at={1} delay={1.5 + i * 0.08} width={2} soft d={d} />)}
+      <D at={1} delay={1.9} width={2} soft d="M860,520 H1010 M820,600 H1015 M880,680 H1020" />
     </g>
   )
 }
 
-function Beams() {
+/** A wireframe club: speaker stacks, a floor in perspective and a crowd that moves to the beat. */
+function Club() {
+  const floor = [-600, -300, 0, 300, 600, 900, 1200, 1500, 1800, 2100].map((x) => `M800,520 L${x},900`).join(' ')
+  const stack = (x: number) => [0, 1, 2, 3].map((r) => `M${x},${300 + r * 85} h150 v80 h-150 Z M${x + 75},${340 + r * 85} m-26,0 a26,26 0 1,0 52,0 a26,26 0 1,0 -52,0`).join(' ')
   return (
-    <g opacity={0.55}>
-      <defs>
-        <linearGradient id="beam-c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#00e5ff" stopOpacity="0.55" /><stop offset="1" stopColor="#00e5ff" stopOpacity="0" /></linearGradient>
-        <linearGradient id="beam-p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ff2bd6" stopOpacity="0.55" /><stop offset="1" stopColor="#ff2bd6" stopOpacity="0" /></linearGradient>
-      </defs>
-      {[200, 560, 1040, 1400].map((x, i) => (
-        <polygon key={x} className="beam" points={`${x},-20 ${x - 140},900 ${x + 140},900`} fill={`url(#beam-${i % 2 ? 'p' : 'c'})`} style={{ animationDelay: `${-i * 1.3}s` }} />
-      ))}
+    <g>
+      <D soft width={2} d={floor} dur={1.4} />
+      <D soft width={2} d="M0,640 H1600 M0,720 H1600 M0,820 H1600" dur={1.2} delay={0.2} />
+      <D width={3} d={stack(70)} delay={0.3} dur={1.4} />
+      <D width={3} d={stack(1380)} delay={0.3} dur={1.4} />
+      <G delay={0.8}>
+        {Array.from({ length: 13 }, (_, i) => {
+          const x = 140 + i * 110
+          return (
+            <g key={i} className="beat" style={{ animationDelay: `${(i % 2) * 0.268}s` }}>
+              <path d={`M${x},720 m-28,0 a28,28 0 1,0 56,0 a28,28 0 1,0 -56,0 M${x - 50},830 C${x - 50},765 ${x + 50},765 ${x + 50},830 Z`} style={{ fill: '#1a2aa8', stroke: 'var(--ink)', strokeWidth: 3 }} />
+            </g>
+          )
+        })}
+      </G>
     </g>
   )
 }
 
-/** The whole booth: light beams, two decks and an equalizer. */
-const Booth = ({ dim = false }: { dim?: boolean }) => (
-  <g opacity={dim ? 0.35 : 1}>
-    <Beams />
-    <Equalizer x={420} y={880} w={760} bars={28} h={190} />
-    <Turntable cx={250} cy={700} />
-    <Turntable cx={1350} cy={700} />
-  </g>
-)
+// ---------- the backdrop: background, 3D world, music, transitions ----------
 
-/** Big neon title with a chromatic-aberration glitch. */
-const NeonTitle = ({ children, size = 150 }: { children: ReactNode; size?: number }) => (
-  <div className="glitch relative text-center font-dj leading-[0.95]" style={{ fontSize: size }}>
-    <span className="absolute inset-0 translate-x-[-4px] text-pink opacity-80 mix-blend-screen">{children}</span>
-    <span className="absolute inset-0 translate-x-[4px] text-neon opacity-80 mix-blend-screen">{children}</span>
-    <span className="relative text-white [text-shadow:0_0_24px_rgba(0,229,255,0.8)]">{children}</span>
-  </div>
-)
+const PIXEL_COLORS = ['#2a40e0', '#3dffc8', '#0b1250', '#d3dcff', '#ff5d8f']
+
+export function AgentsBackdrop({ slide, step }: { slide: number; step: number }) {
+  const light = SURFACE[slide] === 'light'
+  const blank = slide === 0 && step === 0
+  const [muted, setMuted] = useState(false)
+  const [wipe, setWipe] = useState(0)
+  const glow = useRef<HTMLDivElement>(null)
+  const last = useRef({ slide, step })
+
+  // Sound needs a user gesture: the first clicker press unlocks it. M mutes/unmutes.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      music.unlock()
+      if (!e.ctrlKey && !e.altKey && !e.metaKey && !e.repeat && e.key.toLowerCase() === 'm') music.toggleMute()
+    }
+    const onPointer = () => music.unlock()
+    window.addEventListener('keydown', onKey, true)
+    window.addEventListener('pointerdown', onPointer, true)
+    const offMute = music.onMute(setMuted)
+    const offBeat = music.onBeat(() => {
+      const el = glow.current
+      if (!el) return
+      el.classList.add('kick')
+      window.setTimeout(() => el.classList.remove('kick'), 90)
+    })
+    return () => {
+      window.removeEventListener('keydown', onKey, true)
+      window.removeEventListener('pointerdown', onPointer, true)
+      offMute()
+      offBeat()
+      music.stop()
+    }
+  }, [])
+
+  // The music follows the class: each slide/step has its own mix, and every click has a cue.
+  useEffect(() => {
+    music.setMix(mixFor(slide, step))
+    const was = last.current
+    if (slide !== was.slide) {
+      setWipe((w) => w + 1)
+      music.whoosh()
+      if (slide === 12 && slide > was.slide) music.impact()
+    } else if (step > was.step) {
+      if (slide === 0 && step === 1) music.impact()
+      else if (slide === 9 && step % 2 === 1) music.chime()
+      else music.blip()
+    }
+    last.current = { slide, step }
+  }, [slide, step])
+
+  const pixels = useMemo(() => Array.from({ length: 144 }, () => ({
+    color: Math.random() < 0.45 ? 'transparent' : PIXEL_COLORS[Math.floor(Math.random() * PIXEL_COLORS.length)],
+    delay: Math.random() * 0.25,
+  })), [wipe])
+
+  const [part, note] = CHROME[slide]
+  const tone = light ? 'text-ink/55 border-ink/25' : 'text-snow/55 border-snow/25'
+  return (
+    <>
+      <div className="surface dark"><div ref={glow} className="glow" /></div>
+      <div className="surface light" style={{ opacity: light ? 1 : 0 }} />
+      <Suspense fallback={null}><World slide={slide} step={step} /></Suspense>
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" className="chrome" style={{ opacity: blank ? 0 : 1 }}>
+        <foreignObject x={0} y={0} width={1600} height={900}>
+          <div className={`relative h-[900px] w-[1600px] font-mono text-[17px] uppercase tracking-[0.16em] ${tone}`}>
+            <div className={`absolute inset-x-[48px] top-[34px] flex justify-between border-b pb-3 ${tone}`}>
+              <span><b className="font-bold">Everyday AI Agents</b> · {part}</span>
+              <span>{String(slide + 1).padStart(2, '0')} / {SURFACE.length}</span>
+            </div>
+            <div className="absolute inset-x-[48px] bottom-[30px] flex justify-between">
+              <span>{note}</span>
+              <span>{muted ? '♪ muted' : `♪ ${BPM} bpm`}</span>
+            </div>
+          </div>
+        </foreignObject>
+      </svg>
+      {wipe > 0 && (
+        <div key={wipe} className="pixels">
+          {pixels.map((p, i) => <i key={i} style={{ background: p.color, animationDelay: `${p.delay}s` }} />)}
+        </div>
+      )}
+      <div className="scan" />
+    </>
+  )
+}
 
 // ---------- slides ----------
 
 export const slides: SlideDef[] = [
-  // 1 · Dark room, then the booth lights up with the title
-  {
-    steps: 1,
-    Slide: () => {
-      const on = useStep() >= 1
-      return (
-        <>
-          <g style={{ opacity: on ? 1 : 0, transition: 'opacity 1.2s ease' }}><Booth /></g>
-          <Html>
-            <Reveal at={1} delay={0.4} className="absolute inset-x-0 top-[170px]">
-              <Kicker><span className="block text-center">Class · Cumorah Academy</span></Kicker>
-              <NeonTitle>EVERYDAY<br />AI AGENTS</NeonTitle>
-            </Reveal>
-          </Html>
-        </>
-      )
-    },
-  },
-
-  // 2 · Chatbot talks. Agent does.
+  // 1 · Blank blue wall, then the title types itself and the music starts
   {
     steps: 1,
     Slide: () => (
       <>
-        <Booth dim />
+        <OpenBox />
         <Html>
-          <div className="absolute inset-0 grid grid-cols-2 gap-12 px-[120px] pt-[180px]">
-            <Reveal>
-              <Glass className="h-[460px] p-12">
-                <div className="text-[120px] leading-none">💬</div>
-                <div className="mt-10 text-[84px] font-bold">Chatbot <span className="text-white/50">talks.</span></div>
-              </Glass>
-            </Reveal>
-            <Reveal at={1}>
-              <Glass className="h-[460px] border-pink/60 p-12 shadow-[0_0_80px_rgba(255,43,214,0.35)]">
-                <div className="flex gap-6 text-[84px] leading-none">
-                  {['🔍', '📅', '✉️'].map((i, n) => (
-                    <Reveal key={i} at={1} delay={0.4 + n * 0.35}><span>{i}<span className="ml-1 align-top text-[40px] text-lime">✓</span></span></Reveal>
-                  ))}
-                </div>
-                <div className="mt-12 text-[84px] font-bold">Agent <span className="text-pink [text-shadow:0_0_24px_#ff2bd6]">does.</span></div>
-              </Glass>
-            </Reveal>
-          </div>
+          <Reveal at={1} delay={0.2} className="absolute left-[110px] top-[230px]">
+            <Mono className="text-mint">Class · Cumorah Academy</Mono>
+          </Reveal>
+          <Type at={1} delay={0.5} speed={60} text={'Everyday\nAI *agents*'} className="absolute left-[100px] top-[280px] text-[190px] font-extrabold leading-[0.92] tracking-[-0.04em]" />
+          <Reveal at={1} delay={2.2} className="absolute left-[1240px] top-[760px]"><Bot px={11} /></Reveal>
         </Html>
       </>
     ),
   },
 
-  // 3 · The agent is the DJ; the tools are its tracks (one fader up per click)
+  // 2 · A chatbot talks. An agent does.
   {
-    steps: 4,
-    Slide: () => {
-      const step = useStep()
-      const channels = ['Search', 'Calendar', 'Email', 'Code']
-      return (
-        <>
-          <Beams />
-          <Html>
-            <Reveal className="absolute inset-x-0 top-[90px] text-center text-[92px] font-bold">
-              Agent = <span className="text-neon [text-shadow:0_0_24px_#00e5ff]">DJ</span>. Tools = <span className="text-pink [text-shadow:0_0_24px_#ff2bd6]">tracks</span>.
-            </Reveal>
-            <Reveal delay={0.3} className="absolute left-[330px] top-[300px]">
-              <Glass className="flex h-[520px] w-[940px] items-end justify-around px-10 pb-10">
-                {channels.map((c, i) => {
-                  const up = step > i
-                  return (
-                    <div key={c} className="flex h-full flex-col items-center justify-end gap-5">
-                      <div className={`h-6 w-6 rounded-full transition-all duration-500 ${up ? 'bg-lime shadow-[0_0_24px_#b6ff3b]' : 'bg-white/15'}`} />
-                      <div className="relative h-[300px] w-3 rounded-full bg-white/15">
-                        <div
-                          className="absolute left-1/2 h-12 w-24 -translate-x-1/2 rounded-xl border border-white/30 bg-gradient-to-b from-white/90 to-white/50 transition-all duration-700"
-                          style={{ bottom: up ? 250 : 0, boxShadow: up ? '0 0 30px rgba(0,229,255,0.7)' : 'none' }}
-                        />
-                      </div>
-                      <div className={`text-[34px] font-semibold transition-colors duration-500 ${up ? 'text-white' : 'text-white/40'}`}>{c}</div>
-                    </div>
-                  )
-                })}
-              </Glass>
-            </Reveal>
-          </Html>
-        </>
-      )
-    },
+    steps: 1,
+    Slide: () => (
+      <Html light>
+        <Type text={'A chatbot\n*talks.*'} delay={0.3} hl="text-ink/45" className="absolute left-[110px] top-[140px] text-[120px] font-extrabold leading-[0.95] tracking-[-0.035em]" />
+        <Reveal delay={1.3} className="absolute left-[110px] top-[470px] w-[620px]">
+          <div className="rounded-2xl border-2 border-ink/20 bg-white/55 p-7">
+            <Mono className="mb-5 text-[18px] text-ink/50">Chat · just now</Mono>
+            <div className="ml-auto mb-4 w-fit rounded-2xl rounded-br-sm bg-ink px-6 py-3 text-[30px] text-snow">Plan my weekend in Prague.</div>
+            <div className="flex items-end gap-4">
+              <Bot px={5} />
+              <div className="rounded-2xl rounded-bl-sm border-2 border-ink/20 bg-white px-6 py-3 text-[30px]">Here are 5 tips for Prague…</div>
+            </div>
+          </div>
+        </Reveal>
+        <Type at={1} delay={0.2} text={'An agent\n*does.*'} hl="text-green" className="absolute left-[860px] top-[140px] text-[120px] font-extrabold leading-[0.95] tracking-[-0.035em]" />
+        <Reveal at={1} delay={1.1} className="absolute left-[860px] top-[470px] w-[620px]">
+          <div className="rounded-2xl border-2 border-green/60 bg-white/55 p-7">
+            <Mono className="mb-4 text-[18px] text-green">Agent · running</Mono>
+            {['searched trains', 'compared hostels', 'booked under €150'].map((t, i) => (
+              <Reveal key={t} at={1} delay={1.5 + i * 0.45}>
+                <div className="font-mono text-[28px] leading-[1.7]"><span className="text-green">✓</span> {t}</div>
+              </Reveal>
+            ))}
+            <Reveal at={1} blur delay={3} className="mt-2 text-[64px] font-extrabold text-green">Done! ✓</Reveal>
+          </div>
+        </Reveal>
+      </Html>
+    ),
   },
 
-  // 4 · Read the crowd, adjust the mix (the feedback loop)
+  // 3 · Agent = DJ, tools = tracks. Each fader up adds a layer to the music.
+  {
+    steps: 4,
+    Slide: () => (
+      <>
+        <Mixer x={860} y={170} up={useStep()} />
+        <Html>
+          <Type delay={0.3} text={'Agent = *DJ.*\nTools = *tracks.*'} className="absolute left-[100px] top-[270px] text-[100px] font-extrabold leading-[1.02] tracking-[-0.035em]" />
+        </Html>
+      </>
+    ),
+  },
+
+  // 4 · Read the crowd. Adjust the mix.
   {
     steps: 0,
     Slide: () => (
       <>
-        <Beams />
-        <g>
-          {Array.from({ length: 13 }, (_, i) => (
-            <g key={i} className="bounce" style={{ animationDelay: `${(i % 4) * 0.12}s` }}>
-              <circle cx={130 + i * 112} cy={760} r={34} fill="#1b1838" stroke="rgba(0,229,255,0.4)" strokeWidth={3} />
-              <rect x={90 + i * 112} y={800} width={80} height={120} rx={36} fill="#1b1838" stroke="rgba(0,229,255,0.4)" strokeWidth={3} />
-            </g>
-          ))}
-        </g>
-        <path d="M560,560 C420,480 420,330 640,300" fill="none" stroke="var(--accent)" strokeWidth={6} strokeLinecap="round" className="pulse" style={{ filter: 'drop-shadow(0 0 10px #00e5ff)' }} />
-        <path d="M960,300 C1180,330 1180,480 1040,560" fill="none" stroke="var(--pink)" strokeWidth={6} strokeLinecap="round" className="pulse" style={{ filter: 'drop-shadow(0 0 10px #ff2bd6)' }} />
+        <Club />
         <Html>
-          <Reveal className="absolute inset-x-0 top-[200px] text-center">
-            <div className="text-[104px] font-bold leading-tight">Read the crowd.</div>
-            <div className="text-[104px] font-bold leading-tight text-lime [text-shadow:0_0_24px_#b6ff3b]">Adjust the mix.</div>
-          </Reveal>
+          <Type delay={0.6} text={'Read the *crowd.*\nAdjust the *mix.*'} className="absolute inset-x-0 top-[150px] text-center text-[118px] font-extrabold leading-[1.02] tracking-[-0.035em]" />
         </Html>
       </>
     ),
@@ -227,10 +380,8 @@ export const slides: SlideDef[] = [
     steps: 0,
     Slide: () => (
       <Html>
-        <Reveal delay={1.2} className="absolute bottom-[90px] left-[110px]">
-          <Kicker>Part 2</Kicker>
-          <div className="text-[110px] font-bold leading-none">Inside an agent</div>
-        </Reveal>
+        <Reveal delay={1.1} className="absolute bottom-[200px] left-[110px]"><Mono className="text-mint">Part 2</Mono></Reveal>
+        <Type delay={1.3} text="Inside an *agent*" className="absolute bottom-[80px] left-[100px] text-[130px] font-extrabold tracking-[-0.035em]" />
       </Html>
     ),
   },
@@ -240,16 +391,16 @@ export const slides: SlideDef[] = [
     steps: 4,
     Slide: () => {
       const lines = ['what you want.', 'break it down.', 'use the tools.', 'did it work?']
-      const colors = ['text-neon', 'text-lime', 'text-pink', 'text-[#ffd23f]']
       return (
         <Html>
-          <Reveal until={1} className="absolute bottom-[90px] left-[110px] text-[100px] font-bold">The agent loop</Reveal>
+          <Type until={1} delay={0.4} text="The agent *loop*" className="absolute bottom-[80px] left-[100px] text-[120px] font-extrabold tracking-[-0.035em]" />
           {LOOP.map((name, i) => (
             <Reveal key={name} at={i + 1} until={i + 2} delay={0.6} className="absolute bottom-[90px] left-[110px]">
-              <Glass className="px-12 py-8">
-                <span className={`text-[96px] font-bold ${colors[i]}`}>{name}</span>
-                <span className="ml-6 text-[64px] text-white/80">— {lines[i]}</span>
-              </Glass>
+              <Panel className="px-12 py-7">
+                <Mono className="text-[20px] text-mint">Step 0{i + 1} / 04</Mono>
+                <span className="text-[100px] font-extrabold tracking-[-0.03em]">{name}</span>
+                <span className="ml-6 text-[56px] font-medium text-snow/75">{lines[i]}</span>
+              </Panel>
             </Reveal>
           ))}
         </Html>
@@ -262,9 +413,7 @@ export const slides: SlideDef[] = [
     steps: TOOLS.length,
     Slide: () => (
       <Html>
-        <Reveal delay={0.8} className="absolute inset-x-0 top-[70px] text-center text-[96px] font-bold">
-          Tools are its <span className="text-neon [text-shadow:0_0_24px_#00e5ff]">hands.</span>
-        </Reveal>
+        <Type delay={0.9} text="Tools are its *hands.*" className="absolute inset-x-0 top-[120px] text-center text-[110px] font-extrabold tracking-[-0.035em]" />
       </Html>
     ),
   },
@@ -274,13 +423,11 @@ export const slides: SlideDef[] = [
     steps: 3,
     Slide: () => (
       <Html>
-        <Reveal delay={0.8} className="absolute left-[110px] top-[90px] text-[96px] font-bold leading-tight">
-          Memory keeps<br /><span className="text-neon [text-shadow:0_0_24px_#00e5ff]">the context.</span>
-        </Reveal>
+        <Type delay={0.9} text={'Memory keeps\nthe *context.*'} className="absolute left-[100px] top-[130px] text-[110px] font-extrabold leading-[1] tracking-[-0.035em]" />
         <div className="absolute bottom-[110px] left-[110px] flex flex-col gap-4">
           {['You', 'History', 'Preferences'].map((c, i) => (
             <Reveal key={c} at={i + 1} delay={0.3}>
-              <span className="rounded-full border border-neon/60 bg-neon/10 px-8 py-3 text-[44px] font-semibold">{c}</span>
+              <span className="rounded-xl border-2 border-mint/70 bg-[#0d1660]/80 px-7 py-2 font-mono text-[36px] text-mint">+ {c}</span>
             </Reveal>
           ))}
         </div>
@@ -293,36 +440,46 @@ export const slides: SlideDef[] = [
     steps: 1,
     Slide: () => (
       <Html>
-        <Reveal delay={0.8} className="absolute bottom-[150px] left-[170px] w-[560px] text-center">
-          <Glass className="px-8 py-6 text-[54px] font-bold leading-tight">Chatbot:<br /><span className="text-white/60">answers once.</span></Glass>
+        <Reveal delay={0.9} className="absolute bottom-[130px] left-[150px] w-[580px]">
+          <Panel className="px-10 py-7">
+            <Mono className="text-[20px] text-snow/60">Chatbot</Mono>
+            <div className="text-[58px] font-extrabold leading-tight text-snow/70">answers once.</div>
+          </Panel>
         </Reveal>
-        <Reveal at={1} className="absolute bottom-[150px] right-[170px] w-[560px] text-center">
-          <Glass className="border-pink/60 px-8 py-6 text-[54px] font-bold leading-tight">Agent:<br /><span className="text-pink">loops until done.</span></Glass>
+        <Reveal at={1} className="absolute bottom-[130px] right-[150px] w-[580px]">
+          <Panel className="border-mint px-10 py-7">
+            <Mono className="text-[20px] text-mint">Agent</Mono>
+            <div className="text-[58px] font-extrabold leading-tight">loops <span className="text-mint">until done.</span></div>
+          </Panel>
         </Reveal>
       </Html>
     ),
   },
 
-  // 10 · Quiz: chatbot or agent? (show, then reveal ×3)
+  // 10 · Quiz: chatbot or agent? (each request types into a box, then the answer)
   {
     steps: 5,
     Slide: () => {
       const qs = [
-        ['“Explain photosynthesis.”', 'Chatbot'],
-        ['“Book my dentist appointment.”', 'Agent'],
-        ['“Fix my code and test it.”', 'Agent'],
+        ['Explain photosynthesis.', 'Chatbot'],
+        ['Book my dentist appointment.', 'Agent'],
+        ['Fix my code and test it.', 'Agent'],
       ]
       return (
-        <Html>
-          <Reveal delay={0.6} className="absolute inset-x-0 top-[80px] text-center">
-            <Kicker>Your turn</Kicker>
-            <div className="text-[96px] font-bold">Chatbot or agent?</div>
-          </Reveal>
+        <Html light>
+          <Reveal className="absolute left-[110px] top-[150px]"><Mono className="text-green">Your turn · hands up</Mono></Reveal>
+          <Type delay={0.3} text="Chatbot or *agent?*" hl="text-green" className="absolute left-[100px] top-[190px] text-[120px] font-extrabold tracking-[-0.035em]" />
           {qs.map(([q, a], i) => (
-            <Reveal key={q} at={i * 2} until={i * 2 + 2} delay={i === 0 ? 1 : 0.2} className="absolute inset-x-0 top-[430px] flex flex-col items-center gap-10">
-              <Glass className="px-14 py-8 text-[76px] font-semibold">{q}</Glass>
-              <Reveal at={i * 2 + 1}>
-                <span className={`rounded-full px-12 py-4 text-[60px] font-bold uppercase tracking-widest ${a === 'Agent' ? 'bg-pink text-night shadow-[0_0_50px_#ff2bd6]' : 'bg-white/80 text-night'}`}>{a}</span>
+            <Reveal key={q} at={i * 2} until={i * 2 + 2} delay={i === 0 ? 1.1 : 0.1} className="absolute inset-x-[110px] top-[420px]">
+              <Mono className="mb-3 text-[20px] text-ink/50">Request 0{i + 1} / 03</Mono>
+              <div className="rounded-2xl border-[3px] border-ink bg-white/60 px-10 py-7">
+                <Type at={i * 2} until={i * 2 + 2} delay={i === 0 ? 1.5 : 0.4} caret text={q} className="font-mono text-[60px] text-ink" />
+              </div>
+              <Reveal at={i * 2 + 1} blur className="mt-10 flex items-center gap-8">
+                <span className={`rounded-xl px-10 py-3 text-[64px] font-extrabold uppercase tracking-[0.06em] ${a === 'Agent' ? 'bg-green text-snow' : 'bg-ink/80 text-snow'}`}>
+                  {a === 'Agent' ? 'Agent ✓' : 'Chatbot'}
+                </span>
+                {a === 'Agent' && <Bot px={9} color="#0e9f6e" />}
               </Reveal>
             </Reveal>
           ))}
@@ -336,48 +493,45 @@ export const slides: SlideDef[] = [
     steps: EVERYDAY.length,
     Slide: () => (
       <Html>
-        <Reveal delay={0.8} until={1} className="absolute inset-x-0 top-[80px] text-center text-[96px] font-bold">
-          Agents in <span className="text-lime [text-shadow:0_0_24px_#b6ff3b]">everyday life</span>
+        <Reveal delay={0.8} until={1} className="absolute inset-x-0 top-[120px]">
+          <Type delay={0.9} until={1} text="Agents in *everyday life*" className="text-center text-[110px] font-extrabold tracking-[-0.035em]" />
         </Reveal>
       </Html>
     ),
   },
 
-  // 12 · You stay in charge (top view of the whole world)
+  // 12 · You stay in charge: three rules, typed one per click
   {
     steps: 3,
     Slide: () => {
-      const lines: [string, string][] = [
-        ['You stay', 'in charge.'],
-        ['Give a', 'clear goal.'],
-        ['Check', 'the work.'],
-        ['Protect', 'private data.'],
-      ]
+      const step = useStep()
+      const rules = ['Give a clear goal.', 'Check the work.', 'Protect private data.']
       return (
         <Html>
-          {lines.map(([a, b], i) => (
-            <Reveal key={a} at={i} until={i + 1} delay={i === 0 ? 1.4 : 0.3} className="absolute inset-0 flex items-center justify-center">
-              <Glass className="px-16 py-10 text-center">
-                <div className="text-[110px] font-bold leading-none">{a}</div>
-                <div className="text-[110px] font-bold leading-none text-neon [text-shadow:0_0_24px_#00e5ff]">{b}</div>
-              </Glass>
-            </Reveal>
+          <Type delay={0.3} text={'You stay\nin *charge.*'} className="absolute left-[100px] top-[220px] text-[130px] font-extrabold leading-[0.98] tracking-[-0.035em]" />
+          <Reveal delay={0.9} className="absolute left-[820px] top-[200px] w-[680px]">
+            <Mono className="border-b-2 border-snow/30 pb-3 text-[20px] text-snow/60">rules.md · 3 rules</Mono>
+          </Reveal>
+          {rules.map((r, i) => (
+            <div key={r} className="absolute left-[820px] flex items-baseline gap-6" style={{ top: 290 + i * 150, opacity: step > i + 1 ? 0.4 : 1, transition: 'opacity 0.5s' }}>
+              <Reveal at={i + 1}><span className="font-mono text-[34px] text-mint">0{i + 1}</span></Reveal>
+              <Type at={i + 1} delay={0.15} text={r} className="text-[70px] font-extrabold tracking-[-0.03em]" />
+            </div>
           ))}
         </Html>
       )
     },
   },
 
-  // 13 · Back to the booth: you are the DJ
+  // 13 · You are the DJ (the drop)
   {
     steps: 0,
     Slide: () => (
       <>
-        <Booth />
-        <Html>
-          <Reveal delay={0.5} className="absolute inset-x-0 top-[220px]">
-            <NeonTitle size={170}>YOU ARE<br />THE DJ.</NeonTitle>
-          </Reveal>
+        <g className="light-ink"><g transform="translate(615,545) scale(0.52)"><Mixer x={0} y={0} up={4} /></g></g>
+        <Html light>
+          <Type delay={0.4} speed={70} text={'You are\nthe *DJ.*'} hl="text-green" className="absolute inset-x-0 top-[90px] text-center text-[200px] font-extrabold leading-[0.9] tracking-[-0.045em]" />
+          <Reveal delay={1.6} className="absolute left-[1040px] top-[760px]"><div className="beat"><Bot px={10} color="#0e9f6e" /></div></Reveal>
         </Html>
       </>
     ),
@@ -387,14 +541,13 @@ export const slides: SlideDef[] = [
   {
     steps: 0,
     Slide: () => (
-      <>
-        <Booth dim />
-        <Html>
-          <Reveal delay={0.3} className="absolute inset-x-0 top-[300px]">
-            <NeonTitle size={160}>Questions?</NeonTitle>
-          </Reveal>
-        </Html>
-      </>
+      <Html>
+        <Type delay={0.3} speed={60} text="*Questions?*" className="absolute inset-x-0 top-[200px] text-center text-[190px] font-extrabold tracking-[-0.045em]" />
+        <Reveal delay={1.2} className="absolute inset-x-0 top-[560px] flex items-center justify-center gap-8">
+          <Bot px={13} />
+          <div className="dots rounded-2xl border-2 border-snow/60 bg-[#0d1660]/70 px-8 py-4 text-[56px] leading-none text-snow"><i>•</i><i>•</i><i>•</i></div>
+        </Reveal>
+      </Html>
     ),
   },
 ]

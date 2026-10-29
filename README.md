@@ -8,7 +8,7 @@ The home page (`/`) lists every talk made so far:
 | The Importance of Failure in Success (5 min) | `/failure` | [SCRIPT.md](SCRIPT.md) |
 | Good Design Makes a Product Useful (3 min) | `/design` | [SCRIPT-design.md](SCRIPT-design.md) |
 | Homeless to Leaders (2 min, red accent) | `/leaders` | [SCRIPT-leaders.md](SCRIPT-leaders.md) |
-| Everyday AI Agents (20 min class, neon DJ + 3D with Three.js and Tailwind) | `/agents` | [SCRIPT-agents.md](SCRIPT-agents.md) |
+| Everyday AI Agents (20 min class, kinetic type + 3D line art with Three.js and Tailwind, live music — M mutes) | `/agents` | [SCRIPT-agents.md](SCRIPT-agents.md) |
 
 On the home page, use the mouse, or the arrows/clicker to move between cards and Space/Enter to open one (or press `1`–`4`).
 To get back to the list from a talk, use the browser's back button.

@@ -3,24 +3,26 @@
 Open `/agents`. `[CLICK]` = press the clicker once. `(pause)` = stop and look at the class.
 *Nota* lines are for you (in Spanish), not to be read aloud. 44 clicks in total.
 
+**Music:** the class has its own soundtrack (made by the browser, no files). It starts on your first click and follows the slides: full beat on the title, soft under your voice, a layer per fader on the mixer slide, playful during the quiz, and the drop on "You are the DJ". Press **M** to mute or unmute at any time. Check the room's audio before class.
+
 | Part | Style | Time |
 |---|---|---|
-| 1 · The DJ (what an agent is) | Neon DJ booth | 0:00–5:00 |
-| 2 · Inside an agent (loop, tools, memory) | 3D world | 5:00–11:00 |
-| 3 · Your turn + everyday agents | 3D world | 11:00–16:30 |
-| 4 · Using agents well + close | 3D → DJ booth | 16:30–20:00 |
+| 1 · The DJ (what an agent is) | Kinetic type + line art, music up | 0:00–5:00 |
+| 2 · Inside an agent (loop, tools, memory) | 3D line-art world, soft music | 5:00–11:00 |
+| 3 · Your turn + everyday agents | Quiz page + 3D carousel | 11:00–16:30 |
+| 4 · Using agents well + close | Rules list → the drop | 16:30–20:00 |
 
 ---
 
 ## Part 1 · The DJ (0:00)
 
 ### 1 · Everyday AI Agents
-*(Dark screen while you walk up.)*
-`[CLICK]` *(lights, decks and equalizer come on)*
+*(Blank blue screen while you walk up.)*
+`[CLICK]` *(the title types itself and the music comes in)*
 Good morning! Today's class is about something you will use every day very soon, if you aren't already: AI agents.
 Quick question first: who here has used ChatGPT, Gemini or Claude? *(hands)* Great. Keep that in mind, because today we'll see the difference between talking to an AI and an AI that actually does things.
 
-> *Nota:* Energía alta desde el principio. La música es visual: el ecualizador y los discos se mueven solos a 120 BPM.
+> *Nota:* Energía alta desde el principio. La música entra fuerte con el título y baja sola cuando cambias de slide, para que se te escuche.
 
 ### 2 · Chatbot talks. Agent does.
 `[CLICK]`
@@ -39,6 +41,8 @@ An agent is the same. It doesn't do everything by itself. It uses tools:
 `[CLICK]` send an email,
 `[CLICK]` write and run code.
 The skill of an agent is choosing and mixing the right tools for your goal.
+
+> *Nota:* Cada clic sube un fader y añade una capa real a la música (hats, bajo, melodía, beat). Deja que se escuche un segundo antes de seguir: la clase *oye* la metáfora.
 
 ### 4 · Read the crowd. Adjust the mix.
 `[CLICK]`
@@ -121,14 +125,14 @@ Agents are already in everyday life. Let's go around the circle.
 ## Part 4 · Using agents well (16:30)
 
 ### 12 · You stay in charge
-`[CLICK]` *(camera rises above the whole world)*
+`[CLICK]` *(each rule types itself on its own click)*
 Agents are powerful, but you stay in charge. Three rules:
 `[CLICK]` **Give a clear goal.** "Help me" is a bad goal. "Find three hostels in Prague under 30 euros near the station" is a good goal.
 `[CLICK]` **Check the work.** Agents make mistakes. They can sound sure and still be wrong. Always review before you send, pay, or submit.
 `[CLICK]` **Protect private data.** Never give an agent your passwords, bank details or private information it doesn't need. Give it the smallest permissions that work.
 
 ### 13 · You are the DJ
-`[CLICK]` *(back to the DJ booth)*
+`[CLICK]` *(the music drops in at full volume, then let it play two seconds)*
 So remember the DJ. The agent can mix the tracks, read the crowd and change the plan.
 But you choose the music. You decide the goal, you check the result, you say when it's good.
 **You are the DJ.**
