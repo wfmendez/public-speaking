@@ -1,7 +1,16 @@
-# The Importance of Failure in Success — Slides
+# Talks — hand-drawn slides
 
-Hand-drawn style slides for a 5-minute speech that draw themselves as you click. Built with Vite + React.
-Opening the site goes straight to the presentation. The full speech with click cues is in [SCRIPT.md](SCRIPT.md).
+Hand-drawn style slides that draw themselves as you click. Built with Vite + React.
+The home page (`/`) lists every talk made so far:
+
+| Talk | Link | Script |
+|---|---|---|
+| The Importance of Failure in Success (5 min) | `/failure` | [SCRIPT.md](SCRIPT.md) |
+| Good Design Makes a Product Useful (3 min) | `/design` | [SCRIPT-design.md](SCRIPT-design.md) |
+| Homeless to Leaders (2 min, red accent) | `/leaders` | [SCRIPT-leaders.md](SCRIPT-leaders.md) |
+
+On the home page, use the mouse, or the arrows/clicker to move between cards and Space/Enter to open one (or press `1`, `2`, `3`).
+To get back to the list from a talk, use the browser's back button.
 
 ## Run locally
 
@@ -48,6 +57,7 @@ Option B: push this folder to GitHub and import it at vercel.com/new. Vercel det
 
 ## Editing
 
-- Slide content and timing: `src/decks/failure.tsx` (keep each slide at 6 words or fewer)
+- Slide content and timing: `src/decks/*.tsx` (keep each slide at 6 words or fewer)
+- Talk list for the home page: `src/decks/index.ts`
 - Icons: `src/icons.tsx`
 - Colors and animation speed: `src/styles.css`

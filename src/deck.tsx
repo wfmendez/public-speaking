@@ -9,3 +9,5 @@ export const Dot = ({ x, y, at = 0, delay = 0, accent }: { x: number; y: number;
     <circle cx={x} cy={y} r={9} style={{ fill: accent ? 'var(--accent)' : 'var(--ink)' }} />
   </G>
 )
+
+export type DeckDef = { path: string; title: string; minutes: number; accent?: string; slides: SlideDef[] }
