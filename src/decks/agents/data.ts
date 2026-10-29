@@ -18,7 +18,7 @@ export const EVERYDAY = [
 
 /** Background of each slide: the blue LED wall or the light periwinkle page. */
 export const SURFACE: ('dark' | 'light')[] = [
-  'dark', 'light', 'dark', 'dark', 'dark', 'dark', 'dark', 'dark', 'dark', 'light', 'dark', 'dark', 'light', 'dark',
+  'dark', 'light', 'dark', 'dark', 'dark', 'dark', 'dark', 'dark', 'light', 'dark', 'dark', 'light', 'dark',
 ]
 
 /** Small monospace labels in the corners (decoration, never needed to understand the slide). */
@@ -26,12 +26,11 @@ export const CHROME: [string, string][] = [
   ['opening · a song about agents', 'BOT-001 · online'],
   ['part 1 · what is an agent', 'BOT-001 · just now'],
   ['part 1 · the metaphor', 'mixer · 4 channels'],
-  ['part 1 · the metaphor', 'crowd · live feedback'],
   ['part 2 · inside an agent', 'entering the agent'],
   ['part 2 · the loop', 'runs until done'],
   ['part 2 · tools', 'permissions required'],
   ['part 2 · memory', 'context window'],
-  ['part 2 · compare', 'not to scale'],
+  ['part 3 · the twist', 'build passing · game frozen'],
   ['part 3 · your turn', 'hands up'],
   ['part 3 · everyday agents', 'already here'],
   ['part 4 · using agents well', 'rules.md · edited by you'],
@@ -59,12 +58,12 @@ export function mixFor(slide: number, step: number): Mix | null {
       if (step >= 4) Object.assign(layers, { kick: 1, clap: 0.7 })
       return { layers, level: 0.32, cutoff: 9000 }
     }
-    case 3: return { layers: FULL, level: 0.24, cutoff: 2200 }
-    case 4: case 5: case 6: case 7: case 8: return INSIDE
-    case 9: return { layers: { arp: 1, hat: 0.7, clap: 0.6, bass: 0.6 }, level: 0.22, cutoff: 4000 }
-    case 10: return { ...INSIDE, layers: { ...INSIDE.layers, arp: 0.5 } }
-    case 12: return { layers: FULL, level: 0.55, cutoff: 18000 }
-    case 13: return { layers: { pad: 1, arp: 0.5 }, level: 0.2, cutoff: 2400 }
+    case 3: case 4: case 5: case 6: return INSIDE
+    case 7: return step === 1 ? SILENT : TALK // the music stops on the twist
+    case 8: return { layers: { arp: 1, hat: 0.7, clap: 0.6, bass: 0.6 }, level: 0.22, cutoff: 4000 }
+    case 9: return { ...INSIDE, layers: { ...INSIDE.layers, arp: 0.5 } }
+    case 11: return { layers: FULL, level: 0.55, cutoff: 18000 }
+    case 12: return { layers: { pad: 1, arp: 0.5 }, level: 0.2, cutoff: 2400 }
     default: return TALK
   }
 }

@@ -58,30 +58,6 @@ function Mixer({ x, y, up, at = 0 }: { x: number; y: number; up: number; at?: nu
 }
 
 
-/** A wireframe club: speaker stacks, a floor in perspective and a crowd that moves to the beat. */
-function Club() {
-  const floor = [-600, -300, 0, 300, 600, 900, 1200, 1500, 1800, 2100].map((x) => `M800,520 L${x},900`).join(' ')
-  const stack = (x: number) => [0, 1, 2, 3].map((r) => `M${x},${300 + r * 85} h150 v80 h-150 Z M${x + 75},${340 + r * 85} m-26,0 a26,26 0 1,0 52,0 a26,26 0 1,0 -52,0`).join(' ')
-  return (
-    <g>
-      <D soft width={2} d={floor} dur={1.4} />
-      <D soft width={2} d="M0,640 H1600 M0,720 H1600 M0,820 H1600" dur={1.2} delay={0.2} />
-      <D width={3} d={stack(70)} delay={0.3} dur={1.4} />
-      <D width={3} d={stack(1380)} delay={0.3} dur={1.4} />
-      <G delay={0.8}>
-        {Array.from({ length: 13 }, (_, i) => {
-          const x = 140 + i * 110
-          return (
-            <g key={i} className="beat" style={{ animationDelay: `${(i % 2) * 0.268}s` }}>
-              <path d={`M${x},720 m-28,0 a28,28 0 1,0 56,0 a28,28 0 1,0 -56,0 M${x - 50},830 C${x - 50},765 ${x + 50},765 ${x + 50},830 Z`} style={{ fill: '#1a2aa8', stroke: 'var(--ink)', strokeWidth: 3 }} />
-            </g>
-          )
-        })}
-      </G>
-    </g>
-  )
-}
-
 // ---------- the backdrop: background, 3D world, music, transitions ----------
 
 const PIXEL_COLORS = ['#2a40e0', '#3dffc8', '#0b1250', '#d3dcff', '#ff5d8f']
@@ -127,10 +103,10 @@ export function AgentsBackdrop({ slide, step }: { slide: number; step: number })
     if (slide !== was.slide) {
       setWipe((w) => w + 1)
       music.whoosh()
-      if (slide === 12 && slide > was.slide) music.impact()
+      if (slide === 11 && slide > was.slide) music.impact()
     } else if (step > was.step) {
       if (slide === 0) { if (step === 2) music.whoosh() } // the video plays its own cues
-      else if (slide === 9 && step % 2 === 1) music.chime()
+      else if (slide === 8 && step % 2 === 1) music.chime()
       else music.blip()
     }
     last.current = { slide, step }
@@ -226,20 +202,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 4 · Read the crowd. Adjust the mix.
-  {
-    steps: 0,
-    Slide: () => (
-      <>
-        <Club />
-        <Html>
-          <Type delay={0.6} text={'Read the *crowd.*\nAdjust the *mix.*'} className="absolute inset-x-0 top-[150px] text-center text-[118px] font-extrabold leading-[1.02] tracking-[-0.035em]" />
-        </Html>
-      </>
-    ),
-  },
-
-  // 5 · Into the 3D world: inside an agent
+  // 4 · Into the 3D world: inside an agent
   {
     steps: 0,
     Slide: () => (
@@ -250,11 +213,11 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 6 · The loop: Goal → Plan → Act → Check (camera visits each node)
+  // 5 · The loop: Goal → Plan → Act → Check (camera visits each node)
   {
     steps: 4,
     Slide: () => {
-      const lines = ['what you want.', 'break it down.', 'use the tools.', 'did it work?']
+      const lines = ['a party game.', 'rules, screens, scores.', 'writes the code.', 'runs the tests.']
       return (
         <Html>
           <Type until={1} delay={0.4} text="The agent *loop*" className="absolute bottom-[80px] left-[100px] text-[120px] font-extrabold tracking-[-0.035em]" />
@@ -272,7 +235,7 @@ export const slides: SlideDef[] = [
     },
   },
 
-  // 7 · Tools are its hands (cards flip in, one per click)
+  // 6 · Tools are its hands (cards flip in, one per click)
   {
     steps: TOOLS.length,
     Slide: () => (
@@ -282,7 +245,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 8 · Memory keeps the context (slabs stack)
+  // 7 · Memory keeps the context (slabs stack)
   {
     steps: 3,
     Slide: () => (
@@ -299,28 +262,29 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 9 · Chatbot vs agent
+  // 8 · The twist: the agent says "Done ✓"… but was it right?
   {
-    steps: 1,
-    Slide: () => (
-      <Html>
-        <Reveal delay={0.9} className="absolute bottom-[130px] left-[150px] w-[580px]">
-          <Panel className="px-10 py-7">
-            <Mono className="text-[20px] text-snow/60">Chatbot</Mono>
-            <div className="text-[58px] font-extrabold leading-tight text-snow/70">answers once.</div>
-          </Panel>
-        </Reveal>
-        <Reveal at={1} className="absolute bottom-[130px] right-[150px] w-[580px]">
-          <Panel className="border-mint px-10 py-7">
-            <Mono className="text-[20px] text-mint">Agent</Mono>
-            <div className="text-[58px] font-extrabold leading-tight">loops <span className="text-mint">until done.</span></div>
-          </Panel>
-        </Reveal>
-      </Html>
-    ),
+    steps: 2,
+    Slide: () => {
+      const step = useStep()
+      return (
+        <Html>
+          <Reveal until={2} className="absolute inset-x-0 top-[170px] text-center"><Mono className="text-mint">BOT-001 · tests: 12 / 12 passing</Mono></Reveal>
+          <div
+            className={`absolute inset-x-0 top-[230px] text-center text-[230px] font-extrabold leading-none tracking-[-0.04em] text-mint [text-shadow:0_0_50px_rgba(61,255,200,0.6)] ${step === 1 ? 'glitchy' : ''}`}
+            style={{ opacity: step >= 2 ? 0 : 1, transition: 'opacity 0.5s' }}
+          >
+            Done ✓
+          </div>
+          <Type at={1} until={2} delay={0.5} hl="text-bot [text-shadow:0_0_28px_rgba(255,93,143,0.55)]" text="…but was it *right?*" className="absolute inset-x-0 top-[520px] text-center text-[110px] font-extrabold tracking-[-0.035em]" />
+          <Reveal at={1} until={2} delay={1.6} className="absolute inset-x-0 top-[690px] text-center"><Mono className="text-bot">20 players joined → the game froze</Mono></Reveal>
+          <Type at={2} delay={0.2} text={'*You* test.\n*You* decide.'} className="absolute inset-x-0 top-[160px] text-center text-[150px] font-extrabold leading-[0.95] tracking-[-0.04em]" />
+        </Html>
+      )
+    },
   },
 
-  // 10 · Quiz: chatbot or agent? (each request types into a box, then the answer)
+  // 9 · Quiz: chatbot or agent? (each request types into a box, then the answer)
   {
     steps: 5,
     Slide: () => {
@@ -352,7 +316,7 @@ export const slides: SlideDef[] = [
     },
   },
 
-  // 11 · Agents in everyday life (the carousel turns per click)
+  // 10 · Agents in everyday life (the carousel turns per click)
   {
     steps: EVERYDAY.length,
     Slide: () => (
@@ -364,7 +328,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 12 · You stay in charge: three rules, typed one per click
+  // 11 · You stay in charge: three rules, typed one per click
   {
     steps: 3,
     Slide: () => {
@@ -387,7 +351,7 @@ export const slides: SlideDef[] = [
     },
   },
 
-  // 13 · You are the DJ (the drop)
+  // 12 · You are the DJ (the drop)
   {
     steps: 0,
     Slide: () => (
@@ -401,7 +365,7 @@ export const slides: SlideDef[] = [
     ),
   },
 
-  // 14 · Questions
+  // 13 · Questions
   {
     steps: 0,
     Slide: () => (

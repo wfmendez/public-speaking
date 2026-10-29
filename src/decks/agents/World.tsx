@@ -10,7 +10,6 @@ import { EVERYDAY, LOOP, TOOLS } from './data'
  *   core (0,0,0)    the agent loop: Goal → Plan → Act → Check
  *   tools (40,0,0)  cards the agent can use
  *   memory (0,0,-40) stacked context slabs
- *   versus (-40,0,0) chatbot (flat card) vs agent (spinning loop)
  *   everyday (0,0,40) carousel of real-life tasks
  */
 
@@ -29,19 +28,18 @@ const MINT = '#3dffc8'
 const SNOW = '#f3f6ff'
 const NAVY = '#0d1660'
 
-/** Where the camera goes for each slide/step of the agents deck. 3D is visible for slides 5–9 and 11. */
+/** Where the camera goes for each slide/step of the agents deck. 3D is visible for slides 4–7 and 10. */
 export function shotFor(slide: number, step: number): Shot | null {
   switch (slide) {
-    case 4: return { pos: [0, 6, 18], look: [0, 0, 0] }
-    case 5: {
+    case 3: return { pos: [0, 6, 18], look: [0, 0, 0] }
+    case 4: {
       if (step === 0) return { pos: [0, 15, 17], look: [0, -3.5, 0] }
       const [x, , z] = nodePos(step - 1)
       return { pos: [x * 2.9, 6, z * 2.9], look: [x * 0.8, 0, z * 0.8] }
     }
-    case 6: return { pos: [40, 3, 22], look: [40, 0.5, 0] }
-    case 7: return { pos: [12, 7, -26], look: [0, 2 + step * 0.6, -40] }
-    case 8: return { pos: [-40, 3, 16], look: [-40, 0.5, 0] }
-    case 10: return { pos: [0, 3, 58], look: [0, 1, 40] }
+    case 5: return { pos: [40, 3, 22], look: [40, 0.5, 0] }
+    case 6: return { pos: [12, 7, -26], look: [0, 2 + step * 0.6, -40] }
+    case 9: return { pos: [0, 3, 58], look: [0, 1, 40] }
     default: return null
   }
 }
@@ -241,13 +239,6 @@ export default function World({ slide, step }: { slide: number; step: number }) 
     memoryBase.position.set(0, -0.4, -40)
     scene.add(memoryBase)
 
-    // --- versus: chatbot (flat, still) vs agent (alive loop) ---
-    const chat = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 4.25), new THREE.MeshBasicMaterial({ map: cardTexture('Chatbot', 'inbox', 'One answer'), transparent: true }))
-    chat.position.set(-45, 1, 0)
-    const agentKnot = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusKnotGeometry(1.4, 0.38, 64, 6)), lineMat(MINT, 0.6))
-    agentKnot.position.set(-35, 1, 0)
-    scene.add(chat, agentKnot)
-
     // --- everyday: a carousel ---
     const carousel = new THREE.Group()
     carousel.position.set(0, 1, 40)
@@ -305,7 +296,7 @@ export default function World({ slide, step }: { slide: number; step: number }) 
       pulse.position.set(Math.cos(pa) * RING, 0, Math.sin(pa) * RING)
       nodes.forEach(({ group, edges, label }, i) => {
         group.rotation.y += dt
-        const focus = s === 5 && st === i + 1
+        const focus = s === 4 && st === i + 1
         group.scale.lerp(one.setScalar(focus ? 1.4 : 1), k)
         ;(edges.material as THREE.LineBasicMaterial).color.set(focus ? MINT : SNOW)
         // the slide caption names the node being visited, so its own label steps aside
@@ -316,24 +307,21 @@ export default function World({ slide, step }: { slide: number; step: number }) 
       grid.position.z = (t * 2) % 2
 
       tools.forEach(({ card, baseY }, i) => {
-        const shown = s > 6 || (s === 6 && st > i)
+        const shown = s > 5 || (s === 5 && st > i)
         const want = shown ? baseY : baseY + Math.PI
         card.rotation.y += (want - card.rotation.y) * k * 1.4
         card.position.y = 0.5 + Math.sin(t * 1.5 + i) * 0.15
       })
       slabs.forEach((sl, i) => {
-        const shown = s > 7 || (s === 7 && st > i)
+        const shown = s > 6 || (s === 6 && st > i)
         const y = shown ? 0.2 + i * 1.1 : -12
         sl.position.y += (y - sl.position.y) * k * 1.4
-        sl.visible = s >= 7 // hidden under the floor until the memory slide
+        sl.visible = s >= 6 // hidden under the floor until the memory slide
         sl.rotation.y += dt * 0.2 * (i % 2 ? -1 : 1)
       })
-      agentKnot.rotation.x += dt * 0.8
-      agentKnot.rotation.y += dt * 1.1
-      chat.position.y = 1 + Math.sin(t) * 0.05
-      const turn = s === 10 ? -Math.max(st - 1, 0) * (Math.PI / 2) : 0
+      const turn = s === 9 ? -Math.max(st - 1, 0) * (Math.PI / 2) : 0
       carousel.rotation.y += (turn - carousel.rotation.y) * k
-      carousel.visible = s >= 9 // keeps it out of the background of the loop shots
+      carousel.visible = s >= 8 // keeps it out of the background of the loop shots
 
       renderer.render(scene, camera)
     }
