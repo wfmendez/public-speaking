@@ -88,6 +88,26 @@
 .dots i:nth-child(3) { animation-delay: 0.3s; }
 @keyframes dot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-14px); opacity: 1; } }
 
+/* opening video */
+.pop { animation: pop 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes pop { from { opacity: 0; transform: scale(1.12); filter: blur(14px); } to { opacity: 1; transform: none; filter: none; } }
+.drop { transform: rotate(var(--r, 0deg)); animation: drop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes drop { from { opacity: 0; transform: translateY(-140px) rotate(calc(var(--r, 0deg) * -3)); } to { opacity: 1; transform: rotate(var(--r, 0deg)); } }
+.shake { animation: shake 0.268s steps(2) infinite; }
+@keyframes shake { 0% { transform: translate(0, 0); } 50% { transform: translate(-7px, 3px); } 100% { transform: translate(6px, -3px); } }
+.hop { animation: hop 0.536s ease-out infinite; }
+@keyframes hop { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-18px); } }
+.thump { animation: thump 0.4s ease-out both; }
+@keyframes thump { from { transform: scale(1.1); } to { transform: none; } }
+.glitchy { text-shadow: -8px 0 #ff5d8f, 8px 0 #3dffc8; animation: glitchy 0.3s steps(2) infinite; }
+@keyframes glitchy {
+  0% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+  25% { transform: translate(-10px, 4px) skewX(-8deg); clip-path: inset(10% 0 40% 0); }
+  50% { transform: translate(8px, -4px); clip-path: inset(50% 0 5% 0); }
+  75% { transform: translate(-4px, 2px) skewX(5deg); clip-path: inset(0 0 60% 0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .pop, .drop, .shake, .hop, .thump, .glitchy { animation: none !important; }
   .beat, .meter, .blink, .dots i, .pixels i, .caret { animation: none !important; }
 }

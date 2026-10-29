@@ -3,12 +3,13 @@
 Open `/agents`. `[CLICK]` = press the clicker once. `(pause)` = stop and look at the class.
 *Nota* lines are for you (in Spanish), not to be read aloud. 44 clicks in total.
 
-**Music:** the class has its own soundtrack (made by the browser, no files). It starts on your first click and follows the slides: full beat on the title, soft under your voice, a layer per fader on the mixer slide, playful during the quiz, and the drop on "You are the DJ". Press **M** to mute or unmute at any time. Check the room's audio before class.
+**Music:** the class has its own soundtrack (made by the browser, no files). It starts on your first click with the opening video, then follows the slides: full beat on the title, soft under your voice, a layer per fader on the mixer slide, playful during the quiz, and the drop on "You are the DJ". Press **M** to mute or unmute at any time. Check the room's audio before class.
 
 | Part | Style | Time |
 |---|---|---|
-| 1 · The DJ (what an agent is) | Kinetic type + line art, music up | 0:00–5:00 |
-| 2 · Inside an agent (loop, tools, memory) | 3D line-art world, soft music | 5:00–11:00 |
+| 0 · Opening video (a song about agents) | Plays on its own, full music | 0:00–3:00 |
+| 1 · The DJ (what an agent is) | Kinetic type + line art | 3:00–6:00 |
+| 2 · Inside an agent (loop, tools, memory) | 3D line-art world, soft music | 6:00–11:00 |
 | 3 · Your turn + everyday agents | Quiz page + 3D carousel | 11:00–16:30 |
 | 4 · Using agents well + close | Rules list → the drop | 16:30–20:00 |
 
@@ -16,13 +17,15 @@ Open `/agents`. `[CLICK]` = press the clicker once. `(pause)` = stop and look at
 
 ## Part 1 · The DJ (0:00)
 
-### 1 · Everyday AI Agents
+### 1 · Opening video (≈3 min) → Everyday AI Agents
 *(Blank blue screen while you walk up.)*
-`[CLICK]` *(the title types itself and the music comes in)*
-Good morning! Today's class is about something you will use every day very soon, if you aren't already: AI agents.
+`[CLICK]` *(the opening video plays on its own, with music: see [STORY-agents-video.md](STORY-agents-video.md))*
+Don't talk during the video. Stand to the side and watch it with the class.
+*(When it ends it stays on the title by itself, with soft music. If you need to cut it short, one click jumps to the title.)*
+Good morning! The video ended with a question: *who decides?* Today we answer it.
 Quick question first: who here has used ChatGPT, Gemini or Claude? *(hands)* Great. Keep that in mind, because today we'll see the difference between talking to an AI and an AI that actually does things.
 
-> *Nota:* Energía alta desde el principio. La música entra fuerte con el título y baja sola cuando cambias de slide, para que se te escuche.
+> *Nota:* Antes de clase prueba el audio del salón con el video completo. Para ensayar una parte: añade `?from=128` a la dirección (el número es el beat; 128 = el coro).
 
 ### 2 · Chatbot talks. Agent does.
 `[CLICK]`
@@ -50,7 +53,7 @@ And a good DJ does one more thing: they watch the crowd. If people stop dancing,
 Agents do this too. After every action they look at the result: did it work? If not, they change the plan and try again.
 This "look and adjust" is what makes an agent an agent. Remember it, because now we're going inside one.
 
-> *Nota:* Aquí terminan los 5 minutos de la parte DJ. Al siguiente clic, pausa de 2 segundos: la cámara vuela hacia el mundo 3D.
+> *Nota:* Aquí termina la parte DJ. Al siguiente clic, pausa de 2 segundos: la cámara vuela hacia el mundo 3D.
 
 ---
 

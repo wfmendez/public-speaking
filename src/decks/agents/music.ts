@@ -44,6 +44,7 @@ class Music {
   private nextTime = 0
   private sixteenth = 0
   private muted = false
+  private songStart = 0
   private beatListeners = new Set<() => void>()
   private muteListeners = new Set<(muted: boolean) => void>()
 
@@ -89,9 +90,24 @@ class Music {
     this.apply(true)
   }
 
-  setMix(mix: Mix) {
+  /** `cut` jumps straight to the new mix (a hard stop or a drop) instead of easing into it. */
+  setMix(mix: Mix, cut = false) {
     this.mix = mix
-    this.apply(false)
+    this.apply(cut)
+  }
+
+  /** Restarts the pattern on bar 1 so a timeline (the opening video) can follow the beat. */
+  startSong() {
+    const ctx = this.ctx
+    if (!ctx) return
+    this.sixteenth = 0
+    this.nextTime = ctx.currentTime + 0.05
+    this.songStart = this.nextTime
+  }
+
+  /** Beats since `startSong`, on the audio clock; null when there is no sound. */
+  songBeat(): number | null {
+    return this.ctx ? (this.ctx.currentTime - this.songStart) / (60 / BPM) : null
   }
 
   toggleMute() {
@@ -169,6 +185,7 @@ class Music {
   private noiseBurst(t: number, dur: number, out: AudioNode) {
     const src = this.ctx!.createBufferSource()
     src.buffer = this.noise
+    src.loop = true
     src.connect(out)
     src.start(t, Math.random() * 0.5)
     src.stop(t + dur + 0.05)
@@ -261,6 +278,25 @@ class Music {
     g.connect(this.cueOut(1))
     bp.connect(g)
     this.noiseBurst(t, 0.55, bp)
+  }
+
+  /** A noise sweep that rises for `seconds` (the build before a drop). */
+  riser(seconds: number) {
+    const ctx = this.ctx
+    if (!ctx || this.muted) return
+    const t = ctx.currentTime
+    const bp = ctx.createBiquadFilter()
+    bp.type = 'bandpass'
+    bp.Q.value = 2
+    bp.frequency.setValueAtTime(200, t)
+    bp.frequency.exponentialRampToValueAtTime(8000, t + seconds)
+    const g = ctx.createGain()
+    g.gain.setValueAtTime(0, t)
+    g.gain.linearRampToValueAtTime(0.14, t + seconds * 0.95)
+    g.gain.linearRampToValueAtTime(0, t + seconds)
+    g.connect(this.cueOut(1))
+    bp.connect(g)
+    for (let i = 0; i < Math.ceil(seconds / 0.9); i++) this.noiseBurst(t + i * 0.9, 0.95, bp)
   }
 
   /** Step inside a slide: a soft blip. */

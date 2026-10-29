@@ -23,7 +23,7 @@ export const SURFACE: ('dark' | 'light')[] = [
 
 /** Small monospace labels in the corners (decoration, never needed to understand the slide). */
 export const CHROME: [string, string][] = [
-  ['part 1 · what is an agent', 'BOT-001 · online'],
+  ['opening · a song about agents', 'BOT-001 · online'],
   ['part 1 · what is an agent', 'BOT-001 · just now'],
   ['part 1 · the metaphor', 'mixer · 4 channels'],
   ['part 1 · the metaphor', 'crowd · live feedback'],
@@ -43,10 +43,13 @@ const TALK: Mix = { layers: { pad: 1, hat: 0.5, arp: 0.35 }, level: 0.2, cutoff:
 const FULL: Mix['layers'] = { kick: 1, hat: 1, clap: 0.8, bass: 1, pad: 1, arp: 0.6, stab: 0.7 }
 const INSIDE: Mix = { layers: { pad: 1, bass: 0.7, kick: 0.6, hat: 0.4 }, level: 0.2, cutoff: 1500, half: true }
 
-/** What the music does on each slide/step. Loud when nobody is talking, soft under the voice. */
-export function mixFor(slide: number, step: number): Mix {
+/**
+ * What the music does on each slide/step. Loud when nobody is talking, soft under the voice.
+ * null = leave it alone (the opening video drives the music itself).
+ */
+export function mixFor(slide: number, step: number): Mix | null {
   switch (slide) {
-    case 0: return step === 0 ? SILENT : { layers: FULL, level: 0.5, cutoff: 16000 }
+    case 0: return step === 0 ? SILENT : step === 1 ? null : TALK
     // the mixer slide: every fader the speaker "pushes up" adds a real layer to the music
     case 2: {
       const layers: Mix['layers'] = { pad: 1 }
