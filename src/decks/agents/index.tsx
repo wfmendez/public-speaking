@@ -11,7 +11,7 @@ import { BPM, music } from './music'
 import { CHROME, LOOP, mixFor, SURFACE, TOOLS, EVERYDAY } from './data'
 import { Bot, Html, Mono, Panel, Reveal, Type, useStep } from './ui'
 import OpeningVideo from './Video'
-import { hush, say } from './voice'
+import { hush, preloadVoice, shoutExtra } from './voice'
 
 // When the video ends by itself, move to its last step (the title) as if the clicker was pressed.
 const toTitle = () => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown' }))
@@ -73,11 +73,13 @@ export function AgentsBackdrop({ slide, step }: { slide: number; step: number })
 
   // Sound needs a user gesture: the first clicker press unlocks it. M mutes/unmutes.
   useEffect(() => {
+    preloadVoice()
     const onKey = (e: KeyboardEvent) => {
       music.unlock()
+      music.decodeAll()
       if (!e.ctrlKey && !e.altKey && !e.metaKey && !e.repeat && e.key.toLowerCase() === 'm') music.toggleMute()
     }
-    const onPointer = () => music.unlock()
+    const onPointer = () => { music.unlock(); music.decodeAll() }
     window.addEventListener('keydown', onKey, true)
     window.addEventListener('pointerdown', onPointer, true)
     const offMute = music.onMute((m) => { setMuted(m); if (m) hush() })
@@ -104,7 +106,7 @@ export function AgentsBackdrop({ slide, step }: { slide: number; step: number })
     if (slide !== was.slide) {
       setWipe((w) => w + 1)
       music.whoosh()
-      if (slide === 11 && slide > was.slide) { music.impact(); say('You are the DJ!') }
+      if (slide === 11 && slide > was.slide) { music.impact(); music.airhorn(0); shoutExtra('you-are-the-dj') }
     } else if (step > was.step) {
       if (slide === 0) { if (step === 2) music.whoosh() } // the video plays its own cues
       else if (slide === 8 && step % 2 === 1) music.chime()

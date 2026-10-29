@@ -1,0 +1,76 @@
+{
+  "voices": { "dj": "af_bella", "bot": "af_nicole" },
+  "lines": [
+    { "at": 8, "text": "It's Monday." },
+    { "at": 20, "text": "Eight A.M." },
+    { "at": 26, "text": "Wake up!", "fx": "echo" },
+    { "at": 30, "text": "Let's go!" },
+
+    { "at": 32, "text": "Forty-seven emails!" },
+    { "at": 40, "text": "A trip to plan!" },
+    { "at": 48, "text": "Homework, due Friday!" },
+    { "at": 56, "text": "A game to build!" },
+    { "at": 64, "text": "Three group chats!" },
+    { "at": 72, "text": "One dentist appointment!" },
+    { "at": 80, "text": "Too much!", "fx": "stutter" },
+    { "at": 86, "text": "Too much!", "fx": "echo" },
+    { "at": 92, "text": "Way too much!", "fx": "scratch" },
+
+    { "at": 96, "text": "So you ask a chatbot..." },
+    { "at": 104, "text": "Help me." },
+    { "at": 109, "text": "Here are five tips for your week!", "tone": "bot" },
+    { "at": 116, "text": "The work... is still yours.", "tone": "low" },
+    { "at": 120, "text": "Hands up!" },
+    { "at": 124, "text": "Three... two... one...", "tone": "low" },
+
+    { "at": 128, "text": "Meet your agent!", "fx": "echo" },
+    { "at": 136, "text": "It searches!" },
+    { "at": 140, "text": "It plans!" },
+    { "at": 144, "text": "It books!" },
+    { "at": 148, "text": "It writes!" },
+    { "at": 152, "text": "It tests!" },
+    { "at": 156, "text": "It checks!", "fx": "echo" },
+    { "at": 160, "text": "Goal!" },
+    { "at": 162, "text": "Plan!" },
+    { "at": 164, "text": "Act!" },
+    { "at": 166, "text": "Check!" },
+    { "at": 168, "text": "On repeat!", "fx": "stutter" },
+    { "at": 176, "text": "Goal!" },
+    { "at": 178, "text": "Plan!" },
+    { "at": 180, "text": "Act!" },
+    { "at": 182, "text": "Check!" },
+    { "at": 184, "text": "Make some noise!", "fx": "echo" },
+
+    { "at": 192, "text": "Goal: Prague, under one fifty." },
+    { "at": 200, "text": "Plan it!" },
+    { "at": 212, "text": "Act!" },
+    { "at": 216, "text": "Search. Calendar. Email." },
+    { "at": 228, "text": "Check!" },
+    { "at": 234, "text": "One forty-two. Done!" },
+    { "at": 240, "text": "It remembers you." },
+    { "at": 248, "text": "Trains over buses!" },
+    { "at": 252, "text": "Here we go!", "fx": "scratch" },
+
+    { "at": 256, "text": "Inbox zero!" },
+    { "at": 260, "text": "Done!", "fx": "echo" },
+    { "at": 264, "text": "Calendar sorted!" },
+    { "at": 268, "text": "Done!", "fx": "echo" },
+    { "at": 272, "text": "Homework ready!" },
+    { "at": 276, "text": "Done!", "fx": "echo" },
+    { "at": 280, "text": "Game passing!" },
+    { "at": 284, "text": "Done, done, done!", "fx": "stutter" },
+
+    { "at": 288, "text": "Done.", "tone": "low", "fx": "echo" },
+    { "at": 294, "text": "But... is it right?", "tone": "low", "fx": "echo" },
+    { "at": 302, "text": "Who decides?", "tone": "low", "fx": "echo" },
+
+    { "at": 312, "text": "You do!", "fx": "echo" },
+    { "at": 316, "text": "Goal: you!" },
+    { "at": 320, "text": "Check: you!" },
+    { "at": 324, "text": "Everyday A.I. agents!", "fx": "echo" },
+    { "at": 330, "text": "Let's go!" }
+  ],
+  "extra": [
+    { "id": "you-are-the-dj", "text": "You are the D.J.!", "fx": "echo" }
+  ]
+}

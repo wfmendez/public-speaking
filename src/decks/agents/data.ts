@@ -39,7 +39,7 @@ export const CHROME: [string, string][] = [
 ]
 
 const TALK: Mix = { layers: { pad: 1, hat: 0.5, arp: 0.35 }, level: 0.2, cutoff: 1300 }
-const FULL: Mix['layers'] = { kick: 1, hat: 1, clap: 0.8, bass: 1, pad: 1, arp: 0.6, stab: 0.7 }
+const FULL: Mix['layers'] = { kick: 1, hat: 1, clap: 0.8, bass: 1, pad: 1, arp: 0.6, stab: 0.7, lead: 0.8 }
 const INSIDE: Mix = { layers: { pad: 1, bass: 0.7, kick: 0.6, hat: 0.4 }, level: 0.2, cutoff: 1500, half: true }
 
 /**

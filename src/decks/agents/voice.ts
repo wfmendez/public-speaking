@@ -1,9 +1,11 @@
 import { music } from './music'
+import lyrics from './lyrics.json'
 
 /**
- * The DJ / MC voice of the opening video: the browser's own speech synthesis shouting the
- * lines on the beat. It is a robot voice (it speaks in rhythm, it can't sing a melody).
- * It stays quiet while the music is muted (M).
+ * The DJ / MC voice of the opening video. The lines are real recordings made with a neural
+ * voice (tools/make-voice.py → public/agents/voice/*.mp3) and played on the beat with DJ effects.
+ * If a clip is missing, the browser's own (robotic) speech says the line instead.
+ * Everything stays quiet while the music is muted (M).
  */
 
 export type Tone = 'hype' | 'bot' | 'low'
@@ -45,4 +47,29 @@ export function say(text: string, tone: Tone = 'hype') {
 
 export function hush() {
   if ('speechSynthesis' in window) window.speechSynthesis.cancel()
+}
+
+export type Line = { at: number; text: string; tone?: Tone; fx?: 'echo' | 'stutter' | 'scratch' }
+
+/** Same rule as clip_id() in tools/make-voice.py. */
+const clipUrl = (text: string, tone: Tone = 'hype') =>
+  `/agents/voice/${text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}${tone === 'hype' ? '' : `-${tone}`}.mp3`
+
+export const LINES = lyrics.lines as Line[]
+const EXTRA = lyrics.extra as (Omit<Line, 'at'> & { id: string })[]
+
+export function preloadVoice() {
+  music.preload([...LINES, ...EXTRA].map((l) => clipUrl(l.text, l.tone)))
+}
+
+/** Plays a line at audio time `when` (now if omitted); falls back to speech synthesis. */
+export function shout(line: Omit<Line, 'at'>, when?: number) {
+  const ok = music.playClip(clipUrl(line.text, line.tone), when ?? 0, line.fx)
+  if (!ok) say(line.text, line.tone)
+}
+
+/** A line from the "extra" list (used by the class slides), by id. */
+export function shoutExtra(id: string) {
+  const l = EXTRA.find((e) => e.id === id)
+  if (l) shout(l)
 }

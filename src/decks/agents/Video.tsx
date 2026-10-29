@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { BPM, music, SILENT, type Mix } from './music'
 import { Bot, Html, Mono, OpenBox, Typed } from './ui'
-import { hush, say, type Tone } from './voice'
+import { hush, LINES, preloadVoice, shout } from './voice'
 
 /**
  * The opening video (≈3 min): a music video about what agents do. It plays on its own,
@@ -15,7 +15,7 @@ export const SONG_BEATS = 336 // 84 bars
 // where each part of the song starts (in beats)
 const PARTS = [0, 32, 96, 128, 192, 256, 288, 312]
 
-const FULL: Mix['layers'] = { kick: 1, hat: 1, clap: 0.8, bass: 1, pad: 1, arp: 0.6, stab: 0.7 }
+const FULL: Mix['layers'] = { kick: 1, hat: 1, clap: 0.8, bass: 1, pad: 1, arp: 0.5, stab: 0.6, lead: 0.9 }
 type Cue = { at: number; mix?: Mix; cut?: boolean; fx?: 'impact' | 'riser' | 'whoosh' }
 const CUES: Cue[] = [
   { at: 0, mix: { layers: { pad: 1, kick: 0.5 }, level: 0.4, cutoff: 1600, half: true }, cut: true },
@@ -23,33 +23,24 @@ const CUES: Cue[] = [
   { at: 32, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1 }, level: 0.45, cutoff: 5000 }, fx: 'whoosh' },
   { at: 64, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1, clap: 0.8, arp: 0.6 }, level: 0.48, cutoff: 8000 } },
   { at: 96, mix: { layers: { pad: 1, arp: 0.5, hat: 0.4 }, level: 0.4, cutoff: 900 }, fx: 'whoosh' },
-  { at: 120, fx: 'riser' },
   { at: 128, mix: { layers: FULL, level: 0.55, cutoff: 18000 }, cut: true, fx: 'impact' },
-  { at: 192, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1, arp: 1 }, level: 0.46, cutoff: 7000 }, fx: 'whoosh' },
-  { at: 248, fx: 'riser' },
+  { at: 192, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1, arp: 1, lead: 0.4 }, level: 0.46, cutoff: 7000 }, fx: 'whoosh' },
   { at: 256, mix: { layers: FULL, level: 0.6, cutoff: 18000 }, cut: true, fx: 'impact' },
   { at: 288, mix: SILENT, cut: true },
   { at: 312, mix: { layers: FULL, level: 0.6, cutoff: 18000 }, cut: true, fx: 'impact' },
   { at: 328, mix: { layers: { pad: 1, hat: 0.5, arp: 0.35 }, level: 0.25, cutoff: 1500 } },
 ]
 
-/** What the DJ voice shouts, on which beat (a line starts half a beat early so it lands on the beat). */
-const LYRICS: [number, string, Tone?][] = [
-  [8, "It's Monday."], [20, 'Eight A M.'], [26, 'Wake up!'],
-  [32, 'Forty-seven emails!'], [40, 'A trip to plan!'], [48, 'Homework, due Friday!'], [56, 'A game to build!'],
-  [64, 'Three group chats!'], [72, 'One dentist appointment!'], [80, 'Too much!'], [86, 'Too much!'], [92, 'Way too much!'],
-  [96, 'So you ask a chatbot.'], [104, 'Help me.'], [109, 'Here are five tips for your week!', 'bot'],
-  [116, 'The work is still yours.'], [124, 'Three. Two. One.'],
-  [128, 'Meet your agent!'], [136, 'It searches!'], [140, 'It plans!'], [144, 'It books!'], [148, 'It writes!'], [152, 'It tests!'], [156, 'It checks!'],
-  [160, 'Goal!'], [162, 'Plan!'], [164, 'Act!'], [166, 'Check!'], [168, 'On repeat!'],
-  [176, 'Goal!'], [178, 'Plan!'], [180, 'Act!'], [182, 'Check!'], [184, 'Again and again!'],
-  [192, 'Goal: Prague, under one fifty.'], [200, 'Plan it!'], [212, 'Act!'], [216, 'Search. Calendar. Email.'],
-  [228, 'Check!'], [234, 'One forty-two. Done.'], [240, 'It remembers you.'], [248, 'Trains, over buses!'],
-  [256, 'Inbox zero!'], [260, 'Done!'], [264, 'Calendar sorted!'], [268, 'Done!'], [272, 'Homework ready!'], [276, 'Done!'], [280, 'Game passing!'], [284, 'Done, done, done!'],
-  [288, 'Done.', 'low'], [294, 'But is it right?', 'low'], [302, 'Who decides?', 'low'],
-  [312, 'You do!'], [316, 'Goal: you!'], [320, 'Check: you!'], [324, 'Everyday A I agents!'], [330, "Let's go!"],
+/**
+ * DJ effects placed exactly on the audio clock (scheduled a beat ahead):
+ * a build (riser + snare roll) before each drop, and crash + air horn on the drops.
+ */
+type Fx = { at: number; fx: 'build' | 'drop' | 'horn' }
+const FX: Fx[] = [
+  { at: 120, fx: 'build' }, { at: 128, fx: 'drop' },
+  { at: 248, fx: 'build' }, { at: 256, fx: 'drop' },
+  { at: 312, fx: 'drop' }, { at: 330, fx: 'horn' },
 ]
-const LEAD = 0.5
 
 /**
  * The song position in beats (quarter-beat steps), on the audio clock when there is sound.
@@ -59,14 +50,14 @@ function useSongBeat(running: boolean) {
   const [beat, setBeat] = useState(0)
   useEffect(() => {
     if (!running) return
-    music.startSong()
     const from = Number(new URLSearchParams(location.search).get('from')) || 0
+    music.startSong(from)
     const t0 = performance.now() - from * BEAT * 1000
     let raf = 0
     let last = -1
     const tick = () => {
       const audio = music.songBeat()
-      const b = Math.max(0, audio === null ? (performance.now() - t0) / 1000 / BEAT : audio + from)
+      const b = Math.max(0, audio === null ? (performance.now() - t0) / 1000 / BEAT : audio)
       const q = Math.min(Math.floor(b * 4) / 4, SONG_BEATS)
       if (q !== last) { last = q; setBeat(q) }
       if (q < SONG_BEATS) raf = requestAnimationFrame(tick)
@@ -427,16 +418,30 @@ export default function OpeningVideo({ step, onEnd }: { step: number; onEnd: () 
   const beat = useSongBeat(running)
   const fired = useRef(-1)
   const sung = useRef(-1)
+  const fxDone = useRef(-1)
   const ended = useRef(false)
+
+  // download the voice clips as soon as the slide is on screen; decode once sound is unlocked
+  useEffect(() => { preloadVoice() }, [])
+  useEffect(() => { if (running) music.decodeAll() }, [running])
 
   // music cues on their beats
   useEffect(() => {
-    if (!running) { fired.current = -1; sung.current = -1; ended.current = false; hush(); return }
-    // the DJ voice: only the newest line, and only if we're still on time for it
-    LYRICS.forEach(([at, text, tone], i) => {
-      if (i <= sung.current || at - LEAD > beat) return
+    if (!running) { fired.current = -1; sung.current = -1; fxDone.current = -1; ended.current = false; hush(); return }
+    // the DJ voice, scheduled a beat ahead so each line lands on its beat (skipped if we're already late)
+    LINES.forEach((l, i) => {
+      if (i <= sung.current || l.at - 1 > beat) return
       sung.current = i
-      if (beat - (at - LEAD) < 1) say(text, tone)
+      if (beat - l.at < 0.5) shout(l, music.timeAt(l.at))
+    })
+    FX.forEach((f, i) => {
+      if (i <= fxDone.current || f.at - 1 > beat) return
+      fxDone.current = i
+      if (beat > f.at) return
+      const t = music.timeAt(f.at)
+      if (f.fx === 'build') { music.riser(8 * BEAT); music.snareRoll(t, 8) }
+      if (f.fx === 'drop') { music.crash(t); music.airhorn(t) }
+      if (f.fx === 'horn') music.airhorn(t)
     })
     CUES.forEach((c, i) => {
       if (i <= fired.current || c.at > beat) return
@@ -444,7 +449,6 @@ export default function OpeningVideo({ step, onEnd }: { step: number; onEnd: () 
       if (c.mix) music.setMix(c.mix, c.cut)
       if (c.fx === 'impact') music.impact()
       if (c.fx === 'whoosh') music.whoosh()
-      if (c.fx === 'riser') music.riser(8 * BEAT)
     })
     if (beat >= SONG_BEATS && !ended.current) { ended.current = true; onEnd() }
   }, [beat, running, onEnd])

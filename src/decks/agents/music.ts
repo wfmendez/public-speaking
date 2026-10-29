@@ -6,7 +6,7 @@
  * Browsers only allow sound after a user gesture; the first clicker press unlocks it.
  */
 
-export type Layer = 'kick' | 'hat' | 'clap' | 'bass' | 'pad' | 'arp' | 'stab'
+export type Layer = 'kick' | 'hat' | 'clap' | 'bass' | 'pad' | 'arp' | 'stab' | 'lead'
 export type Mix = {
   layers: Partial<Record<Layer, number>>
   /** overall loudness 0..1 (kept low while the speaker talks) */
@@ -19,7 +19,7 @@ export type Mix = {
 
 export const BPM = 112
 const SIXTEENTH = 60 / BPM / 4
-const LAYERS: Layer[] = ['kick', 'hat', 'clap', 'bass', 'pad', 'arp', 'stab']
+const LAYERS: Layer[] = ['kick', 'hat', 'clap', 'bass', 'pad', 'arp', 'stab', 'lead']
 
 // A minor loop: Am – F – C – G (one chord per bar)
 const CHORDS = [
@@ -27,6 +27,13 @@ const CHORDS = [
   { root: 29, notes: [57, 60, 65] },
   { root: 36, notes: [55, 60, 64] },
   { root: 31, notes: [55, 59, 62] },
+]
+// the hook: a rising, hopeful line over the chords (eighth notes, 0 = rest)
+const LEAD = [
+  [76, 0, 76, 74, 76, 0, 79, 76],
+  [77, 0, 76, 72, 69, 0, 72, 0],
+  [76, 0, 76, 74, 72, 0, 67, 0],
+  [74, 0, 74, 76, 79, 0, 81, 79],
 ]
 const hz = (midi: number) => 440 * 2 ** ((midi - 69) / 12)
 
@@ -45,6 +52,12 @@ class Music {
   private sixteenth = 0
   private muted = false
   private songStart = 0
+  private songFrom = 0
+  private vduck!: GainNode
+  private voice!: GainNode
+  private echo!: GainNode
+  private clips = new Map<string, Promise<ArrayBuffer | null>>()
+  private decoded = new Map<string, AudioBuffer>()
   private beatListeners = new Set<() => void>()
   private muteListeners = new Set<(muted: boolean) => void>()
 
@@ -70,7 +83,27 @@ class Music {
     this.filter.type = 'lowpass'
     this.filter.Q.value = 0.7
     this.filter.frequency.value = 800
-    this.filter.connect(this.master)
+    // the music dips a little whenever the DJ voice speaks
+    this.vduck = ctx.createGain()
+    this.vduck.connect(this.master)
+    this.filter.connect(this.vduck)
+
+    // DJ voice: its own bus (never muffled by the music filter) plus a tempo echo
+    this.voice = ctx.createGain()
+    this.voice.connect(comp)
+    const delay = ctx.createDelay(2)
+    delay.delayTime.value = SIXTEENTH * 3
+    const feedback = ctx.createGain()
+    feedback.gain.value = 0.38
+    const tone = ctx.createBiquadFilter()
+    tone.type = 'highpass'
+    tone.frequency.value = 700
+    this.echo = ctx.createGain()
+    this.echo.connect(delay)
+    delay.connect(tone)
+    tone.connect(feedback)
+    feedback.connect(delay)
+    tone.connect(this.voice)
     // pad, bass and arp "pump" under the kick
     this.duck = ctx.createGain()
     this.duck.connect(this.filter)
@@ -96,18 +129,95 @@ class Music {
     this.apply(cut)
   }
 
-  /** Restarts the pattern on bar 1 so a timeline (the opening video) can follow the beat. */
-  startSong() {
+  /**
+   * Restarts the pattern on bar 1 so a timeline (the opening video) can follow the beat.
+   * `from` starts the song at a later beat (for rehearsal).
+   */
+  startSong(from = 0) {
     const ctx = this.ctx
     if (!ctx) return
-    this.sixteenth = 0
+    this.songFrom = from
+    this.sixteenth = Math.round(from * 4) % 64
     this.nextTime = ctx.currentTime + 0.05
     this.songStart = this.nextTime
   }
 
-  /** Beats since `startSong`, on the audio clock; null when there is no sound. */
+  /** Song position in beats, on the audio clock; null when there is no sound. */
   songBeat(): number | null {
-    return this.ctx ? (this.ctx.currentTime - this.songStart) / (60 / BPM) : null
+    return this.ctx ? (this.ctx.currentTime - this.songStart) / (60 / BPM) + this.songFrom : null
+  }
+
+  /** The audio-clock time of a song beat (for scheduling sounds exactly on it). */
+  timeAt(beat: number) {
+    return this.songStart + (beat - this.songFrom) * (60 / BPM)
+  }
+
+  // ---------- DJ voice clips ----------
+
+  /** Starts downloading clips early (before sound is unlocked); decoding happens later. */
+  preload(urls: string[]) {
+    for (const u of urls) {
+      if (!this.clips.has(u)) this.clips.set(u, fetch(u).then((r) => (r.ok ? r.arrayBuffer() : null)).catch(() => null))
+    }
+  }
+
+  /** Decodes every preloaded clip once sound is available. */
+  async decodeAll() {
+    const ctx = this.ctx
+    if (!ctx) return
+    await Promise.all([...this.clips].map(async ([u, p]) => {
+      if (this.decoded.has(u)) return
+      const data = await p
+      if (!data) return
+      try { this.decoded.set(u, await ctx.decodeAudioData(data.slice(0))) } catch { /* bad file: the caller falls back */ }
+    }))
+  }
+
+  hasClip(url: string) { return this.decoded.has(url) }
+
+  /**
+   * Plays a voice clip at audio time `when`, with an optional DJ effect:
+   * echo (repeats on the beat), stutter (the first syllable three times, "a-a-a-"), scratch (pitch wobble).
+   */
+  playClip(url: string, when: number, fx?: 'echo' | 'stutter' | 'scratch') {
+    const ctx = this.ctx
+    const buf = this.decoded.get(url)
+    if (!ctx || !buf || this.muted) return false
+    const t = Math.max(when, ctx.currentTime)
+    const out = ctx.createGain()
+    out.gain.value = 1
+    out.connect(this.voice)
+    if (fx === 'echo') {
+      const send = ctx.createGain()
+      send.gain.value = 0.55
+      out.connect(send)
+      send.connect(this.echo)
+    }
+    if (fx === 'stutter') {
+      for (let i = 3; i >= 1; i--) {
+        const s = ctx.createBufferSource()
+        s.buffer = buf
+        s.connect(out)
+        s.start(Math.max(ctx.currentTime, t - i * SIXTEENTH), 0, SIXTEENTH * 0.8)
+      }
+    }
+    const src = ctx.createBufferSource()
+    src.buffer = buf
+    src.connect(out)
+    if (fx === 'scratch') {
+      const r = src.playbackRate
+      r.setValueAtTime(1, t)
+      r.linearRampToValueAtTime(0.35, t + 0.07)
+      r.linearRampToValueAtTime(1.8, t + 0.14)
+      r.linearRampToValueAtTime(0.5, t + 0.2)
+      r.linearRampToValueAtTime(1, t + 0.28)
+    }
+    src.start(t)
+    // duck the music under the voice
+    const g = this.vduck.gain
+    g.setTargetAtTime(0.5, t, 0.03)
+    g.setTargetAtTime(1, t + buf.duration, 0.2)
+    return true
   }
 
   toggleMute() {
@@ -128,6 +238,7 @@ class Music {
     const t = ctx.currentTime
     const k = now ? 0.01 : 0.35
     this.master.gain.setTargetAtTime(this.muted ? 0 : this.mix.level, t, k)
+    this.voice.gain.setTargetAtTime(this.muted ? 0 : 1, t, 0.02)
     this.filter.frequency.setTargetAtTime(this.mix.cutoff, t, k)
     for (const l of LAYERS) this.gains[l].gain.setTargetAtTime(this.mix.layers[l] ?? 0, t, k * 0.6)
   }
@@ -160,6 +271,10 @@ class Music {
     if (this.on('pad') && s === 0) this.pad(t, chord.notes)
     if (this.on('arp') && s % 2 === 0) this.arp(t, chord.notes[(s / 2) % 3] + 12 + (s >= 8 ? 12 : 0))
     if (this.on('stab') && (s === 0 || s === 6 || s === 10)) this.stab(t, chord.notes)
+    if (this.on('lead') && s % 2 === 0) {
+      const note = LEAD[Math.floor(n / 16)][s / 2]
+      if (note) this.lead(t, note)
+    }
   }
 
   // ---------- instruments ----------
@@ -246,6 +361,14 @@ class Music {
     this.osc('triangle', hz(note), t, 0.2, this.env(t, 0.22, 0.18, this.gains.arp))
   }
 
+  private lead(t: number, note: number) {
+    const lp = this.ctx!.createBiquadFilter()
+    lp.type = 'lowpass'
+    lp.frequency.value = 3800
+    lp.connect(this.env(t, 0.09, 0.32, this.gains.lead, 0.01))
+    for (const d of [-12, 0, 12]) this.osc('sawtooth', hz(note), t, 0.36, lp, d)
+  }
+
   private stab(t: number, notes: number[]) {
     const lp = this.ctx!.createBiquadFilter()
     lp.type = 'lowpass'
@@ -299,6 +422,71 @@ class Music {
     g.connect(this.cueOut(1))
     bp.connect(g)
     for (let i = 0; i < Math.ceil(seconds / 0.9); i++) this.noiseBurst(t + i * 0.9, 0.95, bp)
+  }
+
+  /** A snare roll that speeds up (8ths → 16ths → 32nds) and gets louder, ending at `when + beats`. */
+  snareRoll(when: number, beats: number) {
+    const ctx = this.ctx
+    if (!ctx || this.muted) return
+    when = Math.max(when, ctx.currentTime)
+    const beat = 60 / BPM
+    const end = when + beats * beat
+    let t = when
+    while (t < end - 0.001) {
+      const f = (t - when) / (end - when)
+      const step = f < 0.5 ? beat / 2 : f < 0.75 ? beat / 4 : beat / 8
+      const bp = ctx.createBiquadFilter()
+      bp.type = 'bandpass'
+      bp.frequency.value = 1800 + f * 1500
+      bp.connect(this.env(t, 0.12 + f * 0.4, 0.09, this.cueOut(1)))
+      this.noiseBurst(t, 0.1, bp)
+      this.osc('triangle', 190, t, 0.06, this.env(t, 0.1 + f * 0.2, 0.05, this.cueOut(1)))
+      t += step
+    }
+  }
+
+  /** A crash cymbal for the drops. */
+  crash(when: number) {
+    const ctx = this.ctx
+    if (!ctx || this.muted) return
+    when = Math.max(when, ctx.currentTime)
+    const hp = ctx.createBiquadFilter()
+    hp.type = 'highpass'
+    hp.frequency.value = 5000
+    hp.connect(this.env(when, 0.3, 1.8, this.cueOut(1)))
+    this.noiseBurst(when, 2, hp)
+  }
+
+  /** The classic DJ air horn: baap, baap, baaaap. */
+  airhorn(when: number) {
+    const ctx = this.ctx
+    if (!ctx || this.muted) return
+    when = Math.max(when, ctx.currentTime)
+    const shaper = ctx.createWaveShaper()
+    const curve = new Float32Array(256)
+    for (let i = 0; i < 256; i++) { const x = i / 128 - 1; curve[i] = Math.tanh(x * 3) }
+    shaper.curve = curve
+    const bp = ctx.createBiquadFilter()
+    bp.type = 'bandpass'
+    bp.frequency.value = 1400
+    bp.Q.value = 0.8
+    shaper.connect(bp)
+    const out = this.cueOut(1)
+    for (const [start, len] of [[0, 0.14], [0.19, 0.14], [0.38, 0.62]]) {
+      const t = when + start
+      const g = ctx.createGain()
+      g.gain.setValueAtTime(0, t)
+      g.gain.linearRampToValueAtTime(0.16, t + 0.015)
+      g.gain.setValueAtTime(0.16, t + len - 0.04)
+      g.gain.linearRampToValueAtTime(0, t + len)
+      g.connect(out)
+      bp.connect(g)
+      for (const f of [466, 470, 932]) {
+        const o = this.osc('sawtooth', f * 1.04, t, len, shaper)
+        o.frequency.setValueAtTime(f * 1.04, t)
+        o.frequency.exponentialRampToValueAtTime(f, t + 0.06)
+      }
+    }
   }
 
   /** Step inside a slide: a soft blip. */

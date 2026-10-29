@@ -62,3 +62,20 @@ Option B: push this folder to GitHub and import it at vercel.com/new. Vercel det
 - Talk list for the home page: `src/decks/index.ts`
 - Icons: `src/icons.tsx`
 - Colors and animation speed: `src/styles.css`
+
+## Agents class: DJ voice
+
+The opening video's DJ voice is made of real recordings in `public/agents/voice/*.mp3`, generated with
+[Kokoro](https://github.com/thewh1teagle/kokoro-onnx) (open-source neural voice, runs offline). The lines,
+their beats and their effects (echo, stutter, scratch) live in `src/decks/agents/lyrics.json`.
+
+To change a line or the voice (`"voices": { "dj": "af_bella" }`), edit `lyrics.json` and regenerate:
+
+```bash
+python -m venv .voice-tools/env
+.voice-tools/env/Scripts/python -m pip install kokoro-onnx soundfile
+# put kokoro-v1.0.onnx and voices-v1.0.bin (from the kokoro-onnx "model-files-v1.0" release) in .voice-tools/
+.voice-tools/env/Scripts/python tools/make-voice.py
+```
+
+`--preview` renders one line in several voices into `.voice-tools/previews/`. Needs ffmpeg.
