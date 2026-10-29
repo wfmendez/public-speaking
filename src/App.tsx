@@ -13,5 +13,5 @@ export default function App() {
     if (deck?.accent) document.documentElement.style.setProperty('--accent', deck.accent)
   }, [deck])
 
-  return deck ? <Presenter key={deck.path} slides={deck.slides} /> : <Home />
+  return deck ? <Presenter key={deck.path} slides={deck.slides} theme={deck.theme} Backdrop={deck.Backdrop} /> : <Home />
 }

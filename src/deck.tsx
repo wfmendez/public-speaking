@@ -10,4 +10,7 @@ export const Dot = ({ x, y, at = 0, delay = 0, accent }: { x: number; y: number;
   </G>
 )
 
-export type DeckDef = { path: string; title: string; minutes: number; accent?: string; slides: SlideDef[] }
+export type DeckDef = {
+  path: string; title: string; minutes: number; accent?: string; slides: SlideDef[]
+  theme?: string; Backdrop?: ComponentType<{ slide: number; step: number }>
+}

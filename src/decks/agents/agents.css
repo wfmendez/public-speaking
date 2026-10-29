@@ -1,0 +1,99 @@
+/* Tailwind utilities only (no preflight), so the other talks keep their own base styles. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme {
+  --font-grotesk: 'Space Grotesk', system-ui, sans-serif;
+  --font-dj: 'Bungee', 'Space Grotesk', sans-serif;
+  --color-neon: #00e5ff;
+  --color-pink: #ff2bd6;
+  --color-lime: #b6ff3b;
+  --color-night: #06050d;
+}
+
+/* Neon "DJ / agentic" theme: dark room, glowing ink. */
+.stage.neon {
+  --paper: #06050d;
+  --ink: #eaf2ff;
+  --soft: rgba(234, 242, 255, 0.22);
+  --accent: #00e5ff;
+  --pink: #ff2bd6;
+  --lime: #b6ff3b;
+  background:
+    radial-gradient(ellipse at 50% 120%, rgba(255, 43, 214, 0.22), transparent 60%),
+    radial-gradient(ellipse at 50% -20%, rgba(0, 229, 255, 0.18), transparent 55%),
+    #06050d;
+}
+.neon .canvas { position: relative; z-index: 1; font-family: 'Space Grotesk', system-ui, sans-serif; }
+.neon .draw.accent, .neon .write.accent { filter: drop-shadow(0 0 6px var(--accent)) drop-shadow(0 0 18px var(--accent)); }
+.neon .draw.pink { stroke: var(--pink); filter: drop-shadow(0 0 6px var(--pink)) drop-shadow(0 0 16px var(--pink)); }
+.neon .write.pink { fill: var(--pink); filter: drop-shadow(0 0 10px var(--pink)); }
+.neon .progress { opacity: 0.6; }
+
+/* the 3D world sits behind the slide overlay */
+.world {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+.world.on { opacity: 1; }
+.world canvas { display: block; width: 100%; height: 100%; }
+
+/* --- DJ booth animations (120 BPM: one beat = 0.5s) --- */
+.eq-bar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: eq 0.5s ease-in-out infinite alternate;
+}
+@keyframes eq {
+  from { transform: scaleY(0.15); }
+  to { transform: scaleY(1); }
+}
+.vinyl {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spin 1.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.beam {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: sway 4s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+}
+@keyframes sway {
+  from { transform: rotate(-14deg); }
+  to { transform: rotate(14deg); }
+}
+.pulse {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: pulse 0.5s ease-out infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.12); opacity: 0.55; }
+}
+.bounce {
+  transform-box: fill-box;
+  animation: bounce 0.5s ease-in-out infinite alternate;
+}
+@keyframes bounce { to { transform: translateY(-14px); } }
+.glitch { animation: glitch 2.5s steps(1) infinite; }
+@keyframes glitch {
+  0%, 92%, 100% { transform: translate(0, 0); }
+  93% { transform: translate(-6px, 2px); }
+  95% { transform: translate(5px, -3px); }
+  97% { transform: translate(-3px, 1px); }
+}
+
+/* overlay reveal used by the HTML (Tailwind) parts of slides */
+.reveal { opacity: 0; transform: translateY(24px) scale(0.98); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.reveal.in { opacity: 1; transform: none; }
+.reveal.out { opacity: 0; transform: translateY(-24px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar, .vinyl, .beam, .pulse, .bounce, .glitch { animation: none !important; }
+}

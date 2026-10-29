@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type TouchEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type ComponentType, type TouchEvent } from 'react'
 import { StepContext } from './components/Draw'
 import type { SlideDef } from './deck'
 
@@ -18,7 +18,13 @@ const readHash = (slides: SlideDef[]): Pos => {
 const NEXT = new Set(['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter', 'n'])
 const PREV = new Set(['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'])
 
-export default function Presenter({ slides }: { slides: SlideDef[] }) {
+export default function Presenter({ slides, theme, Backdrop }: {
+  slides: SlideDef[]
+  /** Extra class on the stage, e.g. a dark theme for one deck. */
+  theme?: string
+  /** A layer drawn behind every slide that stays mounted between slides (e.g. a 3D world). */
+  Backdrop?: ComponentType<{ slide: number; step: number }>
+}) {
   const [pos, setPos] = useState<Pos>(() => readHash(slides))
   const [mounted, setMounted] = useState(false)
   const [black, setBlack] = useState(false)
@@ -102,12 +108,13 @@ export default function Presenter({ slides }: { slides: SlideDef[] }) {
 
   return (
     <main
-      className="stage"
+      className={theme ? `stage ${theme}` : 'stage'}
       onClick={onClick}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       onContextMenu={(e) => { e.preventDefault(); prev() }}
     >
+      {Backdrop && <Backdrop slide={pos.slide} step={pos.step} />}
       <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" className="canvas">
         <StepContext.Provider value={mounted ? pos.step : -1}>
           <g key={pos.slide} className="slide">
