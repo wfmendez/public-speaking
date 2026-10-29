@@ -73,6 +73,7 @@ export const ICONS = {
   ],
   stairs: ['M-48,40 H-24 V18 H0 V-4 H24 V-26 H48', 'M10,-42 L32,-42 M24,-50 L32,-42 L24,-34'],
   flag: ['M-18,44 V-44', 'M-18,-44 H30 L20,-31 L30,-18 H-18'],
+  star: ['M0.0,-12.0 L2.9,-4.0 L11.4,-3.7 L4.8,1.5 L7.1,9.7 L0.0,5.0 L-7.1,9.7 L-4.8,1.5 L-11.4,-3.7 L-2.9,-4.0 Z'],
   cross: ['M-38,-36 L38,38', 'M36,-38 L-36,36'],
   check: ['M-16,0 L-4,13 L20,-16'],
 } as const
@@ -80,16 +81,16 @@ export const ICONS = {
 export type IconName = keyof typeof ICONS
 
 export function Icon({
-  name, x, y, size = 1, at = 0, delay = 0, until, accent, soft, speed = 0.7,
+  name, x, y, size = 1, at = 0, delay = 0, until, accent, soft, flame, speed = 0.7,
 }: {
   name: IconName; x: number; y: number; size?: number; at?: number; delay?: number
-  until?: number; accent?: boolean; soft?: boolean; speed?: number
+  until?: number; accent?: boolean; soft?: boolean; flame?: boolean; speed?: number
 }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${size})`}>
       {ICONS[name].map((d, i) => (
         <D
-          key={i} d={d} at={at} until={until} accent={accent} soft={soft} flame={d === FLAME}
+          key={i} d={d} at={at} until={until} accent={accent} soft={soft} flame={flame || d === FLAME}
           width={3.6 / size} delay={delay + i * speed * 0.6} dur={speed}
         />
       ))}

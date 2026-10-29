@@ -193,12 +193,15 @@ export const slides: SlideDef[] = [
       <>
         <Dot x={150} y={780} />
         <D d={TANGLE} dur={5} delay={0.3} />
-        <Icon name="flag" x={1484} y={192} size={0.8} delay={5} speed={0.5} accent />
-        <Icon name="ring" x={330} y={440} size={0.42} delay={1.1} speed={0.4} soft />
-        <Icon name="shop" x={1120} y={380} size={0.42} delay={1.8} speed={0.4} soft />
-        <Icon name="cap" x={440} y={560} size={0.42} delay={2.4} speed={0.4} soft />
-        <Icon name="briefcase" x={930} y={480} size={0.42} delay={3} speed={0.4} soft />
-        <Icon name="candle" x={1150} y={640} size={0.42} delay={3.8} speed={0.4} soft />
+        {/* the flag is a milestone, not the end: the line keeps going */}
+        <Icon name="flag" x={1488} y={183} size={1.2} delay={5} speed={0.5} accent />
+        <Icon name="star" x={1495} y={146} size={1} delay={5.6} speed={0.4} flame />
+        <D d="M1466,236 C1520,212 1560,196 1640,160" delay={5.9} dur={0.9} />
+        <Icon name="ring" x={320} y={440} size={0.65} delay={1.1} speed={0.4} soft />
+        <Icon name="shop" x={1130} y={360} size={0.65} delay={1.8} speed={0.4} soft />
+        <Icon name="cap" x={455} y={565} size={0.65} delay={2.4} speed={0.4} soft />
+        <Icon name="briefcase" x={960} y={330} size={0.65} delay={3} speed={0.4} soft />
+        <Icon name="candle" x={1165} y={640} size={0.65} delay={3.8} speed={0.4} soft />
         <T x={800} y={170} size={104} at={1} weight={600}>
           Failure was the <tspan style={{ fill: 'var(--accent)' }}>material.</tspan>
         </T>
