@@ -11,6 +11,7 @@ import { BPM, music } from './music'
 import { CHROME, LOOP, mixFor, SURFACE, TOOLS, EVERYDAY } from './data'
 import { Bot, Html, Mono, Panel, Reveal, Type, useStep } from './ui'
 import OpeningVideo from './Video'
+import { hush, say } from './voice'
 
 // When the video ends by itself, move to its last step (the title) as if the clicker was pressed.
 const toTitle = () => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown' }))
@@ -79,7 +80,7 @@ export function AgentsBackdrop({ slide, step }: { slide: number; step: number })
     const onPointer = () => music.unlock()
     window.addEventListener('keydown', onKey, true)
     window.addEventListener('pointerdown', onPointer, true)
-    const offMute = music.onMute(setMuted)
+    const offMute = music.onMute((m) => { setMuted(m); if (m) hush() })
     const offBeat = music.onBeat(() => {
       const el = glow.current
       if (!el) return
@@ -103,7 +104,7 @@ export function AgentsBackdrop({ slide, step }: { slide: number; step: number })
     if (slide !== was.slide) {
       setWipe((w) => w + 1)
       music.whoosh()
-      if (slide === 11 && slide > was.slide) music.impact()
+      if (slide === 11 && slide > was.slide) { music.impact(); say('You are the DJ!') }
     } else if (step > was.step) {
       if (slide === 0) { if (step === 2) music.whoosh() } // the video plays its own cues
       else if (slide === 8 && step % 2 === 1) music.chime()

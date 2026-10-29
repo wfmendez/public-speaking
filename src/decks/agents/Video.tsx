@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { BPM, music, SILENT, type Mix } from './music'
 import { Bot, Html, Mono, OpenBox, Typed } from './ui'
+import { hush, say, type Tone } from './voice'
 
 /**
  * The opening video (≈3 min): a music video about what agents do. It plays on its own,
@@ -31,6 +32,24 @@ const CUES: Cue[] = [
   { at: 312, mix: { layers: FULL, level: 0.6, cutoff: 18000 }, cut: true, fx: 'impact' },
   { at: 328, mix: { layers: { pad: 1, hat: 0.5, arp: 0.35 }, level: 0.25, cutoff: 1500 } },
 ]
+
+/** What the DJ voice shouts, on which beat (a line starts half a beat early so it lands on the beat). */
+const LYRICS: [number, string, Tone?][] = [
+  [8, "It's Monday."], [20, 'Eight A M.'], [26, 'Wake up!'],
+  [32, 'Forty-seven emails!'], [40, 'A trip to plan!'], [48, 'Homework, due Friday!'], [56, 'A game to build!'],
+  [64, 'Three group chats!'], [72, 'One dentist appointment!'], [80, 'Too much!'], [86, 'Too much!'], [92, 'Way too much!'],
+  [96, 'So you ask a chatbot.'], [104, 'Help me.'], [109, 'Here are five tips for your week!', 'bot'],
+  [116, 'The work is still yours.'], [124, 'Three. Two. One.'],
+  [128, 'Meet your agent!'], [136, 'It searches!'], [140, 'It plans!'], [144, 'It books!'], [148, 'It writes!'], [152, 'It tests!'], [156, 'It checks!'],
+  [160, 'Goal!'], [162, 'Plan!'], [164, 'Act!'], [166, 'Check!'], [168, 'On repeat!'],
+  [176, 'Goal!'], [178, 'Plan!'], [180, 'Act!'], [182, 'Check!'], [184, 'Again and again!'],
+  [192, 'Goal: Prague, under one fifty.'], [200, 'Plan it!'], [212, 'Act!'], [216, 'Search. Calendar. Email.'],
+  [228, 'Check!'], [234, 'One forty-two. Done.'], [240, 'It remembers you.'], [248, 'Trains, over buses!'],
+  [256, 'Inbox zero!'], [260, 'Done!'], [264, 'Calendar sorted!'], [268, 'Done!'], [272, 'Homework ready!'], [276, 'Done!'], [280, 'Game passing!'], [284, 'Done, done, done!'],
+  [288, 'Done.', 'low'], [294, 'But is it right?', 'low'], [302, 'Who decides?', 'low'],
+  [312, 'You do!'], [316, 'Goal: you!'], [320, 'Check: you!'], [324, 'Everyday A I agents!'], [330, "Let's go!"],
+]
+const LEAD = 0.5
 
 /**
  * The song position in beats (quarter-beat steps), on the audio clock when there is sound.
@@ -238,6 +257,41 @@ function Burst() {
   return <div className="pixels">{cells.map((c, i) => <i key={i} style={{ background: c.color, animationDelay: `${c.delay}s` }} />)}</div>
 }
 
+/** Giant outlined words sliding behind everything, two rows in opposite directions. */
+function Marquee({ word }: { word: string }) {
+  const row = Array.from({ length: 6 }, () => word).join(' · ') + ' · '
+  const cls = 'whitespace-nowrap text-[230px] font-extrabold leading-none tracking-[-0.03em] text-transparent [-webkit-text-stroke:2px_rgba(243,246,255,0.13)]'
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className={`marquee absolute top-[90px] ${cls}`}>{row}{row}</div>
+      <div className={`marquee reverse absolute top-[560px] ${cls}`}>{row}{row}</div>
+    </div>
+  )
+}
+
+/** An equalizer along the bottom edge, bouncing at the tempo. */
+function Equalizer() {
+  return (
+    <div className="pointer-events-none absolute bottom-[78px] left-[48px] flex h-[70px] w-[1504px] items-end gap-[6px] opacity-60">
+      {Array.from({ length: 64 }, (_, i) => (
+        <i key={i} className="meter block flex-1 rounded-t-sm" style={{ height: `${30 + ((i * 37) % 70)}%`, background: i % 7 === 3 ? '#ff5d8f' : '#3dffc8', animationDelay: `${((i * 53) % 27) / 100}s`, animationDuration: `${0.18 + ((i * 29) % 20) / 100}s` }} />
+      ))}
+    </div>
+  )
+}
+
+/** Everything in front pumps on each kick drum and slowly drifts, like a camera on a dance floor. */
+function Pulse({ children }: { children: ReactNode }) {
+  const el = useRef<HTMLDivElement>(null)
+  useEffect(() => music.onBeat(() => {
+    const d = el.current
+    if (!d) return
+    d.classList.add('kick')
+    window.setTimeout(() => d.classList.remove('kick'), 110)
+  }), [])
+  return <div className="drift absolute inset-0"><div ref={el} className="vpulse absolute inset-0">{children}</div></div>
+}
+
 // ---------- the timeline ----------
 
 function Frame({ b }: { b: number }) {
@@ -247,8 +301,14 @@ function Frame({ b }: { b: number }) {
   const verb = Math.floor((b - 136) / 4)
   const hit = Math.floor((b - 256) / 8)
 
+  const kick = !(in_(0, 16) || in_(96, 128) || in_(288, 312)) // sections where the beat is pumping
+  const word = ['MONDAY', 'TOO MUCH', 'HELP ME', 'AGENT', 'GOAL PLAN ACT CHECK', 'DONE', '', 'YOU'][part]
   return (
     <Html>
+      {word && b < SONG_BEATS && <Marquee key={word} word={word} />}
+      {kick && b < 324 && <Equalizer />}
+      {[128, 256, 312].map((x) => in_(x, x + 1) && <div key={x} className="flash absolute inset-0 bg-snow" />)}
+      <Pulse>
       {/* 1 · intro: it's Monday */}
       {in_(0, 8) && <Caret className="left-[110px] top-[330px] h-[150px] text-[150px]" />}
       {in_(8, 32) && <Head text="it's *Monday.*" className="left-[100px] top-[280px] text-[170px]" />}
@@ -286,12 +346,12 @@ function Frame({ b }: { b: number }) {
       {/* 4 · chorus: meet your agent */}
       {in_(128, 136) && (
         <>
-          <Head text="meet your *agent.*" className="inset-x-0 top-[200px] text-center text-[170px]" />
+          <Head text="meet your *agent.*" className="inset-x-0 top-[200px] text-center text-[150px]" />
           <div className="pop absolute left-[730px] top-[540px]"><div className="hop"><Bot px={16} /></div></div>
         </>
       )}
       {in_(136, 160) && (
-        <div key={verb} className="pop absolute inset-x-0 top-[250px] text-center">
+        <div key={verb} className="slam absolute inset-x-0 top-[250px] text-center">
           <Mono className="mb-4 text-mint">Tool call 0{verb + 1} / 06</Mono>
           <div className={`${H} text-[230px]`}>it <span className="text-mint [text-shadow:0_0_40px_rgba(61,255,200,0.6)]">{VERBS[verb]}.</span></div>
         </div>
@@ -354,7 +414,9 @@ function Frame({ b }: { b: number }) {
         </>
       )}
 
+      </Pulse>
       {part > 0 && b < SONG_BEATS && <Burst key={part} />}
+      {b < SONG_BEATS && Math.floor(b) % 16 === 0 && b >= 16 && !in_(288, 312) && <Burst key={`bar${Math.floor(b)}`} />}
     </Html>
   )
 }
@@ -364,11 +426,18 @@ export default function OpeningVideo({ step, onEnd }: { step: number; onEnd: () 
   const running = step === 1
   const beat = useSongBeat(running)
   const fired = useRef(-1)
+  const sung = useRef(-1)
   const ended = useRef(false)
 
   // music cues on their beats
   useEffect(() => {
-    if (!running) { fired.current = -1; ended.current = false; return }
+    if (!running) { fired.current = -1; sung.current = -1; ended.current = false; hush(); return }
+    // the DJ voice: only the newest line, and only if we're still on time for it
+    LYRICS.forEach(([at, text, tone], i) => {
+      if (i <= sung.current || at - LEAD > beat) return
+      sung.current = i
+      if (beat - (at - LEAD) < 1) say(text, tone)
+    })
     CUES.forEach((c, i) => {
       if (i <= fired.current || c.at > beat) return
       fired.current = i
@@ -379,6 +448,8 @@ export default function OpeningVideo({ step, onEnd }: { step: number; onEnd: () 
     })
     if (beat >= SONG_BEATS && !ended.current) { ended.current = true; onEnd() }
   }, [beat, running, onEnd])
+
+  useEffect(() => hush, [])
 
   if (step < 1) return null
   const b = running ? beat : SONG_BEATS

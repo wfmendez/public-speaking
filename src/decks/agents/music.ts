@@ -116,6 +116,8 @@ class Music {
     this.muteListeners.forEach((f) => f(this.muted))
   }
 
+  isMuted() { return this.muted }
+
   onBeat(f: () => void) { this.beatListeners.add(f); return () => { this.beatListeners.delete(f) } }
   onMute(f: (muted: boolean) => void) { this.muteListeners.add(f); return () => { this.muteListeners.delete(f) } }
 

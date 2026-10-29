@@ -107,7 +107,20 @@
   75% { transform: translate(-4px, 2px) skewX(5deg); clip-path: inset(0 0 60% 0); }
 }
 
+.slam { animation: slam 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+@keyframes slam { from { opacity: 0; transform: scale(2.6); filter: blur(10px); } 60% { opacity: 1; filter: none; } to { transform: none; } }
+.flash { animation: flash 0.45s ease-out both; pointer-events: none; }
+@keyframes flash { from { opacity: 0.75; } to { opacity: 0; } }
+.marquee { animation: marquee 14s linear infinite; }
+.marquee.reverse { animation-direction: reverse; animation-duration: 18s; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.drift { animation: drift 9.6s ease-in-out infinite alternate; }
+@keyframes drift { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.035) translate(-14px, -8px); } }
+.vpulse { transition: transform 0.22s ease-out; transform-origin: 50% 55%; }
+.vpulse.kick { transform: scale(1.022); transition: none; }
+
 @media (prefers-reduced-motion: reduce) {
+  .slam, .flash, .marquee, .drift,
   .pop, .drop, .shake, .hop, .thump, .glitchy { animation: none !important; }
   .beat, .meter, .blink, .dots i, .pixels i, .caret { animation: none !important; }
 }
