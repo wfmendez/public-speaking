@@ -291,7 +291,7 @@ export default function World({ slide, step }: { slide: number; step: number }) 
       // ambient motion
       brain.rotation.y += dt * 0.4
       brain.rotation.x += dt * 0.15
-      heart.scale.setScalar(1 + Math.sin(t * Math.PI * (112 / 30)) * 0.08) // pulses at 112 BPM, like the music
+      heart.scale.setScalar(1 + Math.sin(t * Math.PI * (120 / 30)) * 0.08) // pulses at 120 BPM, like the music
       const pa = t * 0.9
       pulse.position.set(Math.cos(pa) * RING, 0, Math.sin(pa) * RING)
       nodes.forEach(({ group, edges, label }, i) => {

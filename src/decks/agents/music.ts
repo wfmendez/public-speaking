@@ -6,7 +6,7 @@
  * Browsers only allow sound after a user gesture; the first clicker press unlocks it.
  */
 
-export type Layer = 'kick' | 'hat' | 'clap' | 'bass' | 'pad' | 'arp' | 'stab' | 'lead'
+export type Layer = 'kick' | 'hat' | 'clap' | 'bass' | 'pad' | 'arp' | 'stab' | 'lead' | 'bounce' | 'piano' | 'pluck' | 'shaker'
 export type Mix = {
   layers: Partial<Record<Layer, number>>
   /** overall loudness 0..1 (kept low while the speaker talks) */
@@ -17,9 +17,9 @@ export type Mix = {
   half?: boolean
 }
 
-export const BPM = 112
+export const BPM = 120
 const SIXTEENTH = 60 / BPM / 4
-const LAYERS: Layer[] = ['kick', 'hat', 'clap', 'bass', 'pad', 'arp', 'stab', 'lead']
+const LAYERS: Layer[] = ['kick', 'hat', 'clap', 'bass', 'pad', 'arp', 'stab', 'lead', 'bounce', 'piano', 'pluck', 'shaker']
 
 // A minor loop: Am – F – C – G (one chord per bar)
 const CHORDS = [
@@ -122,7 +122,7 @@ class Music {
     for (const l of LAYERS) {
       const g = ctx.createGain()
       g.gain.value = 0
-      g.connect(l === 'pad' || l === 'bass' || l === 'arp' ? this.duck : this.filter)
+      g.connect(l === 'pad' || l === 'bass' || l === 'arp' || l === 'bounce' || l === 'piano' ? this.duck : this.filter)
       this.gains[l] = g
     }
 
@@ -294,6 +294,11 @@ class Music {
       const note = LEAD[Math.floor(n / 16)][s / 2]
       if (note) this.lead(t, note)
     }
+    // the dance-pop layers of the opening song: octave bass, offbeat piano, a high sparkle, a shaker
+    if (this.on('bounce') && s % 2 === 0) this.bounce(t, chord.root + (s % 4 === 2 ? 24 : 12))
+    if (this.on('piano') && s % 4 === 2) this.piano(t, chord.notes)
+    if (this.on('pluck')) this.pluck(t, [...chord.notes, chord.notes[0] + 12][[0, 1, 2, 3, 2, 1, 2, 3][s % 8]] + 24)
+    if (this.on('shaker')) this.shaker(t, s % 4 === 2 ? 0.16 : s % 2 ? 0.07 : 0.04)
   }
 
   // ---------- instruments ----------
@@ -394,6 +399,44 @@ class Music {
     lp.frequency.value = 2200
     lp.connect(this.env(t, 0.12, 0.16, this.gains.stab))
     for (const n of notes) this.osc('square', hz(n + 12), t, 0.18, lp)
+  }
+
+  /** Bass that bounces between octaves: a saw whose filter snaps shut, so every note plucks. */
+  private bounce(t: number, note: number) {
+    const lp = this.ctx!.createBiquadFilter()
+    lp.type = 'lowpass'
+    lp.Q.value = 4
+    lp.frequency.setValueAtTime(1800, t)
+    lp.frequency.exponentialRampToValueAtTime(220, t + 0.14)
+    lp.connect(this.env(t, 0.42, 0.2, this.gains.bounce))
+    this.osc('sawtooth', hz(note), t, 0.22, lp)
+    this.osc('square', hz(note - 12), t, 0.22, lp)
+  }
+
+  /** House piano on the offbeats: short, bright chords with a bit of hammer. */
+  private piano(t: number, notes: number[]) {
+    const lp = this.ctx!.createBiquadFilter()
+    lp.type = 'lowpass'
+    lp.frequency.value = 4200
+    lp.connect(this.env(t, 0.13, 0.28, this.gains.piano, 0.002))
+    for (const n of [...notes, notes[0] + 12]) {
+      this.osc('triangle', hz(n + 12), t, 0.3, lp)
+      this.osc('square', hz(n + 12), t, 0.1, this.env(t, 0.25, 0.06, lp))
+    }
+  }
+
+  /** A fast, quiet arpeggio high above the voice. */
+  private pluck(t: number, note: number) {
+    this.osc('triangle', hz(note), t, 0.12, this.env(t, 0.1, 0.1, this.gains.pluck))
+    this.osc('square', hz(note), t, 0.1, this.env(t, 0.04, 0.06, this.gains.pluck))
+  }
+
+  private shaker(t: number, peak: number) {
+    const hp = this.ctx!.createBiquadFilter()
+    hp.type = 'highpass'
+    hp.frequency.value = 9000
+    hp.connect(this.env(t, peak, 0.035, this.gains.shaker, 0.006))
+    this.noiseBurst(t, 0.05, hp)
   }
 
   // ---------- cues (played straight away, outside the mix filter) ----------

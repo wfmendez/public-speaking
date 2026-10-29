@@ -68,7 +68,8 @@ Option B: push this folder to GitHub and import it at vercel.com/new. Vercel det
 The opening video is a song, sung line by line in `public/agents/song/*.mp3`. Each word is said by
 [Kokoro](https://github.com/thewh1teagle/kokoro-onnx) (open-source neural voice, runs offline), then Praat
 ([parselmouth](https://github.com/YannickJadoul/Parselmouth)) stretches it to its notes and moves it onto the
-melody, with vibrato, a doubled track and a harmony on the choruses. The lyrics and their melody live in
+melody, gliding from word to word, with vibrato on long notes, a second voice doubling it in stereo and a
+harmony on the choruses. The lyrics and their melody live in
 `src/decks/agents/song.json` (`word=NOTE:beats`, e.g. `agent=A4:.5,C5:2.5`); the lyrics on screen light up
 word by word from the same notes.
 
