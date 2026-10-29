@@ -65,7 +65,8 @@ const PIXEL_COLORS = ['#2a40e0', '#3dffc8', '#0b1250', '#d3dcff', '#ff5d8f']
 
 export function AgentsBackdrop({ slide, step }: { slide: number; step: number }) {
   const light = SURFACE[slide] === 'light'
-  const blank = slide === 0 && step === 0
+  // no corner labels on the blank wall, nor while the video plays (it has its own)
+  const blank = slide === 0 && step < 2
   const [muted, setMuted] = useState(false)
   const [wipe, setWipe] = useState(0)
   const glow = useRef<HTMLDivElement>(null)

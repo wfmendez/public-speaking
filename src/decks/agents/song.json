@@ -1,0 +1,60 @@
+{
+  "bpm": 112,
+  "voice": "af_bella",
+  "scale": "A minor",
+  "about": "Each line starts on beat `at`. `notes`: word=NOTE:beats[,NOTE:beats…] (several notes = one word sung over a melody), _=beats is a rest. `harmony` adds a third above.",
+  "lines": [
+    { "at": 8, "notes": "It's=E4:.5 Monday,=G4:.5,E4:1 _=.5 eight=E4:.5 A.M.=D4:.5,C4:2" },
+    { "at": 16, "notes": "Wake=A4:.5 up,=E4:1 _=.5 wake=A4:.5 up!=C5:2" },
+    { "at": 24, "notes": "Here=G4:.5 we=G4:.5 go=E4:1 again=D4:.5,G4:2" },
+
+    { "at": 32, "notes": "Forty-seven=A4:.5,A4:.5,G4:.5,E4:.5 emails=E4:.5,D4:.5 waiting,=C4:.5,E4:1.5" },
+    { "at": 40, "notes": "a=E4:.5 trip=G4:.5 I=G4:.5 have=A4:.5 to=G4:.5 plan,=E4:.5,D4:1.5" },
+    { "at": 48, "notes": "homework=A4:.5,A4:.5 due=G4:.5 on=E4:.5 Friday,=E4:.5,C4:1.5" },
+    { "at": 56, "notes": "a=E4:.5 game=G4:.5 I=G4:.5 haven't=A4:.5,G4:.5 built,=E4:.5,D4:1.5" },
+    { "at": 64, "notes": "three=A4:.5 group=A4:.5 chats=G4:.5 are=E4:.5 blowing=E4:.5,D4:.5 up,=C4:1.5" },
+    { "at": 72, "notes": "one=E4:.5 dentist=G4:.5,G4:.5 I=A4:.5 forgot.=G4:.5,D4:2" },
+    { "at": 80, "notes": "Too=C5:.5 much,=A4:1.5 too=C5:.5 much,=A4:1.5" },
+    { "at": 88, "notes": "it's=G4:.5 way=C5:1 too=B4:.5 much=A4:.5 for=G4:.5 me!=G4:2" },
+
+    { "at": 96, "notes": "So=E4:.5 I=E4:.5 asked=A4:1 a=G4:.5 chatbot:=E4:.5,C4:1.5" },
+    { "at": 104, "notes": "“Help=G4:1 me.”=E4:2" },
+    { "at": 116, "notes": "But=C4:.5 the=C4:.5 work=E4:1 is=D4:.5 still=C4:.5 mine.=A3:2.5" },
+    { "at": 124, "notes": "Three,=D4:1 two,=G4:1 one!=B4:2" },
+
+    { "at": 128, "notes": "Meet=E4:.5 your=G4:.5 agent!=A4:.5,C5:2.5", "harmony": true },
+    { "at": 136, "notes": "It=E4:.5 searches,=G4:.5,E4:1", "harmony": true },
+    { "at": 140, "notes": "it=D4:.5 plans,=G4:1.5", "harmony": true },
+    { "at": 144, "notes": "it=E4:.5 books,=A4:1.5", "harmony": true },
+    { "at": 148, "notes": "it=F4:.5 writes,=A4:1.5", "harmony": true },
+    { "at": 152, "notes": "it=G4:.5 tests,=C5:1.5", "harmony": true },
+    { "at": 156, "notes": "it=B4:.5 checks!=D5:2", "harmony": true },
+    { "at": 160, "notes": "Goal,=A4:1.5 _=.5 plan,=G4:1.5 _=.5 act,=F4:1.5 _=.5 check,=A4:2", "harmony": true },
+    { "at": 168, "notes": "on=G4:.5 repeat,=G4:.5,C5:1 all=B4:.5 night=A4:.5 long.=G4:2", "harmony": true },
+    { "at": 176, "notes": "Goal,=A4:1.5 _=.5 plan,=G4:1.5 _=.5 act,=F4:1.5 _=.5 check,=A4:2", "harmony": true },
+    { "at": 184, "notes": "it=G4:.5 gets=G4:.5 the=A4:.5 job=B4:.5 done=C5:1 right!=D5:2", "harmony": true },
+
+    { "at": 192, "notes": "Goal:=A4:1 a=E4:.5 weekend=E4:.5,G4:.5 in=E4:.5 Prague,=C4:2" },
+    { "at": 200, "notes": "under=E4:.5,G4:.5 one-fifty,=G4:.5,A4:.5,G4:.5 make=E4:.5 a=D4:.5 plan,=E4:1.5" },
+    { "at": 208, "notes": "find=A4:.5 the=A4:.5 trains,=G4:1 compare=E4:.5,E4:.5 the=D4:.5 beds,=C4:1.5" },
+    { "at": 216, "notes": "search,=G4:1 calendar,=G4:.5,A4:.5,G4:.5 email,=E4:.5,D4:2" },
+    { "at": 224, "notes": "check=A4:1 the=G4:.5 price:=E4:2.5" },
+    { "at": 232, "notes": "one=G4:.5 forty-two,=A4:.5,G4:.5,E4:.5 it's=D4:.5 done!=G4:2" },
+    { "at": 240, "notes": "And=C4:.5 it=E4:.5 remembers=A4:.5,A4:.5,G4:.5 you:=E4:2" },
+    { "at": 248, "notes": "trains=G4:.5 over=G4:.5,A4:.5 buses,=G4:.5,E4:.5 every=D4:.5,E4:.5 time.=G4:1.5" },
+
+    { "at": 256, "notes": "Inbox=A4:.5,A4:.5 zero,=G4:.5,E4:.5 done!=C5:2", "harmony": true },
+    { "at": 264, "notes": "Calendar=G4:.5,G4:.5,A4:.5 sorted,=G4:.5,E4:.5 done!=D5:2", "harmony": true },
+    { "at": 272, "notes": "Homework=A4:.5,A4:.5 ready,=G4:.5,E4:.5 done!=C5:2", "harmony": true },
+    { "at": 280, "notes": "Game=G4:.5 is=G4:.5 passing,=A4:.5,G4:.5 done,=D5:.5 done,=D5:.5 done!=D5:1.5", "harmony": true },
+
+    { "at": 288, "notes": "Done.=A4:3" },
+    { "at": 294, "notes": "But=E4:.5 is=E4:.5 it=D4:.5 right?=E4:3" },
+    { "at": 302, "notes": "Who=C4:1 decides?=D4:.5,E4:3" },
+
+    { "at": 312, "notes": "You=G4:1 do!=C5:3", "harmony": true },
+    { "at": 316, "notes": "Goal:=D5:1 _=.5 you!=B4:2.5", "harmony": true },
+    { "at": 320, "notes": "Check:=C5:1 _=.5 you!=A4:2.5", "harmony": true },
+    { "at": 324, "notes": "Everyday=F4:.5,A4:.5,C5:.5 A.I.=C5:.5,D5:.5 agents!=C5:1,A4:3", "harmony": true }
+  ]
+}
