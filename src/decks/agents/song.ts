@@ -29,7 +29,10 @@ export function preloadSong() {
   music.preload(SONG.map((l) => l.url))
 }
 
-/** Plays a sung line at audio time `when`, with a little room reverb. */
+/** Each clip starts this long before its first beat: the first consonant comes in early so the vowel lands on the beat. */
+const LEAD_IN = 0.09
+
+/** Plays a sung line whose first beat falls at audio time `when`, with a little room reverb. */
 export function singLine(line: SungLine, when: number) {
-  music.playClip(line.url, when, 'sing')
+  music.playClip(line.url, when - LEAD_IN, 'sing')
 }

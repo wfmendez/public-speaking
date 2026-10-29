@@ -18,21 +18,22 @@ const PARTS = [0, 32, 96, 128, 192, 256, 288, 312]
 const PART_NAMES = ['intro', 'verse 1 · monday', 'pre-chorus · the chatbot', 'chorus · the agent', 'verse 2 · watch it work', 'chorus 2 · done', 'bridge', 'final · you']
 const ROOMS = ['#monday', '#monday', 'chat · just now', '#agent', 'trip_prague.md', '#done', '…', '#you']
 
-// no synth lead in the video: the voice sings the melody
-const FULL: Mix['layers'] = { kick: 1, hat: 1, clap: 0.8, bass: 1, pad: 1, arp: 0.5, stab: 0.6 }
+// a bright dance-pop band under the voice: octave bass, offbeat piano, shaker (no synth lead: the voice sings the melody)
+const BAND: Mix['layers'] = { kick: 1, hat: 0.8, clap: 0.9, bounce: 1, piano: 1, shaker: 1 }
+const FULL: Mix['layers'] = { ...BAND, pluck: 1, pad: 0.3 }
 type Cue = { at: number; mix?: Mix; cut?: boolean; fx?: 'impact' | 'riser' | 'whoosh' }
 const CUES: Cue[] = [
-  { at: 0, mix: { layers: { pad: 1, kick: 0.5 }, level: 0.36, cutoff: 1600, half: true }, cut: true },
-  { at: 16, mix: { layers: { pad: 1, kick: 0.6, hat: 0.5 }, level: 0.38, cutoff: 2600, half: true } },
-  { at: 32, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1 }, level: 0.4, cutoff: 5000 }, fx: 'whoosh' },
-  { at: 64, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1, clap: 0.8, arp: 0.5 }, level: 0.42, cutoff: 8000 } },
-  { at: 96, mix: { layers: { pad: 1, arp: 0.5, hat: 0.4 }, level: 0.36, cutoff: 900 }, fx: 'whoosh' },
-  { at: 128, mix: { layers: FULL, level: 0.5, cutoff: 18000 }, cut: true, fx: 'impact' },
-  { at: 192, mix: { layers: { pad: 1, kick: 1, hat: 1, bass: 1, arp: 0.8 }, level: 0.42, cutoff: 7000 }, fx: 'whoosh' },
-  { at: 256, mix: { layers: FULL, level: 0.52, cutoff: 18000 }, cut: true, fx: 'impact' },
+  { at: 0, mix: { layers: { piano: 1, shaker: 0.8 }, level: 0.36, cutoff: 2400 }, cut: true },
+  { at: 16, mix: { layers: { piano: 1, shaker: 1, kick: 0.8, bounce: 0.7 }, level: 0.4, cutoff: 4500 } },
+  { at: 32, mix: { layers: BAND, level: 0.44, cutoff: 9000 }, fx: 'whoosh' },
+  { at: 64, mix: { layers: { ...BAND, pluck: 0.6 }, level: 0.46, cutoff: 12000 } },
+  { at: 96, mix: { layers: { piano: 1, shaker: 0.8, kick: 0.7, pluck: 0.5 }, level: 0.4, cutoff: 1400, half: true }, fx: 'whoosh' },
+  { at: 128, mix: { layers: FULL, level: 0.52, cutoff: 18000 }, cut: true, fx: 'impact' },
+  { at: 192, mix: { layers: BAND, level: 0.45, cutoff: 10000 }, fx: 'whoosh' },
+  { at: 256, mix: { layers: FULL, level: 0.54, cutoff: 18000 }, cut: true, fx: 'impact' },
   { at: 288, mix: SILENT, cut: true },
-  { at: 312, mix: { layers: FULL, level: 0.52, cutoff: 18000 }, cut: true, fx: 'impact' },
-  { at: 328, mix: { layers: { pad: 1, hat: 0.5, arp: 0.35, lead: 0.5 }, level: 0.25, cutoff: 1500 } },
+  { at: 312, mix: { layers: FULL, level: 0.54, cutoff: 18000 }, cut: true, fx: 'impact' },
+  { at: 328, mix: { layers: { piano: 0.8, shaker: 0.6, pluck: 0.4 }, level: 0.25, cutoff: 3000 } },
 ]
 
 /** Effects placed exactly on the audio clock (scheduled a beat ahead): a build (riser + snare roll) and a crash on each drop. */

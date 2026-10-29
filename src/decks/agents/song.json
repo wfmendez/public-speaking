@@ -1,6 +1,6 @@
 {
-  "bpm": 112,
-  "voice": "af_bella",
+  "bpm": 120,
+  "voices": ["af_bella", "af_heart"],
   "scale": "A minor",
   "about": "Each line starts on beat `at`. `notes`: word=NOTE:beats[,NOTE:beats…] (several notes = one word sung over a melody), _=beats is a rest. `harmony` adds a third above.",
   "lines": [
