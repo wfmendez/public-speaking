@@ -1,0 +1,7 @@
+/* The 3D emojis live behind the text of the slides. */
+.stage.feelings { cursor: default; }
+.feelings .canvas { position: relative; z-index: 1; }
+.feelings .progress { z-index: 2; }
+.feelings .blackout { z-index: 3; }
+.emoji-world { position: absolute; inset: 0; }
+.emoji-world canvas { display: block; }

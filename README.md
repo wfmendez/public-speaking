@@ -9,8 +9,9 @@ The home page (`/`) lists every talk made so far:
 | Good Design Makes a Product Useful (3 min) | `/design` | [SCRIPT-design.md](SCRIPT-design.md) |
 | Homeless to Leaders (2 min, red accent) | `/leaders` | [SCRIPT-leaders.md](SCRIPT-leaders.md) |
 | Everyday AI Agents (20 min class: a 3-min sung opening music video, kinetic type + 3D line art with Three.js and Tailwind, live music — M mutes; story in [STORY-agents-video.md](STORY-agents-video.md)) | `/agents` | [SCRIPT-agents.md](SCRIPT-agents.md) |
+| How Do You Feel? Emotions & Emojis (English lesson with animated 3D emojis made with Three.js, and an activity on the students' phones at `/feel`; no sound) | `/emotions` | [SCRIPT-emotions.md](SCRIPT-emotions.md) |
 
-On the home page, use the mouse, or the arrows/clicker to move between cards and Space/Enter to open one (or press `1`–`4`).
+On the home page, use the mouse, or the arrows/clicker to move between cards and Space/Enter to open one (or press `1`–`5`).
 To get back to the list from a talk, use the browser's back button.
 
 ## Run locally
@@ -87,3 +88,19 @@ python -m venv .voice-tools/env
 
 `make-song.py --preview` also writes the whole vocal track to `.voice-tools/previews/song-vocals.wav`;
 `make-voice.py --preview` renders one line in several voices. Both need ffmpeg.
+
+## Emotions lesson: phone activity and printed material
+
+`/feel` is the students' activity: it needs no account and stores nothing, and the last screen shows the score. Its exercises
+are in `src/decks/emotions/tasks.ts`, shared with the worksheet. If the site's address changes, make
+`public/emotions/feel-qr.svg` again and update the link on the slide.
+
+`/emotions/print` shows everything to print, on A4: a two-sided worksheet, 32 cards to cut out (16 faces, 16 words) and
+a page for the teacher (answers, card games, lesson plan). The ready-made PDFs are in `public/emotions/`.
+The faces are drawn in `src/decks/emotions/faces.tsx`: the sheets print them flat and the slides wrap them on 3D balls (`World.tsx`), so they always match.
+
+After changing `src/decks/emotions/Print.tsx`, make the PDFs again with the site running (`npm run dev`):
+
+```bash
+python tools/make-print.py
+```
