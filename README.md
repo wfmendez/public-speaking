@@ -10,8 +10,9 @@ The home page (`/`) lists every talk made so far:
 | Homeless to Leaders (2 min, red accent) | `/leaders` | [SCRIPT-leaders.md](SCRIPT-leaders.md) |
 | Everyday AI Agents (20 min class: a 3-min sung opening music video, kinetic type + 3D line art with Three.js and Tailwind, live music — M mutes; story in [STORY-agents-video.md](STORY-agents-video.md)) | `/agents` | [SCRIPT-agents.md](SCRIPT-agents.md) |
 | How Do You Feel? Emotions & Emojis (English lesson with animated 3D emojis made with Three.js, and an activity on the students' phones at `/feel`; no sound) | `/emotions` | [SCRIPT-emotions.md](SCRIPT-emotions.md) |
+| How Am I Going to Achieve My Cumorah Academy Goals? (5 min, film title cards on black, 6 words or fewer per screen) | `/goals` | [SCRIPT-goals.md](SCRIPT-goals.md) |
 
-On the home page, use the mouse, or the arrows/clicker to move between cards and Space/Enter to open one (or press `1`–`5`).
+On the home page, use the mouse, or the arrows/clicker to move between cards and Space/Enter to open one (or press `1`–`6`).
 To get back to the list from a talk, use the browser's back button.
 
 ## Run locally

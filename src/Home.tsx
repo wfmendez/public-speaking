@@ -22,6 +22,10 @@ const PREVIEWS: Record<string, string[]> = {
     'M130,72 v10 M190,72 v10',
     'M118,116 Q160,156 202,116',
   ],
+  '/goals': [
+    'M40,38 H280 V158 H40 Z',
+    'M90,98 H230',
+  ],
   '/leaders': [
     'M90,172 H230 V146 H90 Z',
     'M102,140 H218 V114 H102 Z',

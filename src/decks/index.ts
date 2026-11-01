@@ -3,6 +3,7 @@ import { AgentsBackdrop, slides as agents } from './agents'
 import { slides as design } from './design'
 import { EmotionsBackdrop, slides as emotions } from './emotions'
 import { slides as failure } from './failure'
+import { slides as goals } from './goals'
 import { slides as leaders } from './leaders'
 
 // Every talk made so far; the home page lists them in this order.
@@ -12,4 +13,5 @@ export const decks: DeckDef[] = [
   { path: '/leaders', title: 'Homeless to Leaders', minutes: 2, accent: '#c8102e', slides: leaders },
   { path: '/agents', title: 'Everyday AI Agents', minutes: 20, accent: '#2236c8', slides: agents, theme: 'kinetic', Backdrop: AgentsBackdrop },
   { path: '/emotions', title: 'How Do You Feel? Emotions & Emojis', minutes: 20, accent: '#0e7f86', slides: emotions, theme: 'feelings', Backdrop: EmotionsBackdrop },
+  { path: '/goals', title: 'How Am I Going to Achieve My Cumorah Academy Goals?', minutes: 5, accent: '#555555', slides: goals, theme: 'cine' },
 ]
