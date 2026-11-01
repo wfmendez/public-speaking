@@ -1,8 +1,6 @@
-# How Am I Going to Achieve My Cumorah Academy Goals? — Script (≈5 min)
+# A Goal Is Like a Seed — Script (≈5 min)
 
 Open http://localhost:5173/goals (or pick it on the home page). `[CLICK]` = press the clicker once.
-
-**Before you practise.** Replace the parts in `[brackets]` with your own words, and change any step of the plan that is not true for you.
 
 ## The pauses
 
@@ -14,69 +12,69 @@ Open http://localhost:5173/goals (or pick it on the home page). `[CLICK]` = pres
 
 - Before you start, stand still and look at the room for 2–3 seconds.
 - Before your most important lines, take one second. These are marked with `(1)`.
-- Every click cuts to black and the title fades in. Stay quiet until it has fully appeared, then speak.
+- After each click, let the words appear and the drawing move before you speak.
 - A pause feels much longer to you than to the audience. Look at people, not at the screen, and count in your head.
 
 ---
 
-**Where are you going?** *(0:00–0:35)*
+**The seed**
 
 *(black screen; walk up, stand still, look at the room)*
 
-`[CLICK]` Where are you going? /// Not today. In life. //
+Think of the biggest tree you have ever seen. // Now imagine it the size of your fingernail.
 
-When I came to Cumorah Academy, I wrote a list of goals. / A goal is like a journey. Some have already arrived. Some are still at the start. / And none of them moves by itself. //
+`[CLICK]` (1) A goal is like a seed. //
 
-**Four down** *(0:35–1:45)*
+`[CLICK]` It starts small. / A new language. A better job. A healthy body. / At the beginning, every big goal is only an idea. // And a seed teaches us five things.
 
-`[CLICK]` Help others. I have done this. / I help people with their websites, and I give them advice about AI and other things. /
+**One: plant it**
 
-`[CLICK]` Networking. [One sentence: someone you met, or a door it opened.] /
+`[CLICK]` First, plant it. / A seed in your hand is only a wish. //
 
-`[CLICK]` Freelance. [One sentence: what you did and how it felt to be paid for it.] /
+`[CLICK]` So choose one goal. Not ten. //
 
-`[CLICK]` Travel. [One sentence: a place you went.] //
+`[CLICK]` Give it a date. / A date turns a wish into a plan. //
 
-`[CLICK]` Four goals, done. I am proud of them. //
+`[CLICK]` And find good soil. / Good people are like soil: they feed you without you seeing it. / A place like Cumorah Academy. //
 
-`[CLICK]` (1) But two are still missing. // So how am I going to get there? ///
+**Two: water it**
 
-**Goal one: C1** *(1:45–2:35)*
+`[CLICK]` Second, water it. //
 
-`[CLICK]` First: C1 in the Cambridge exam. /
+`[CLICK]` Small habits are like water. / Ten new words. One page. One phone call. / A bucket once a month does not grow a plant. A little water every day does. //
 
-`[CLICK]` I will book the exam. / A date turns a wish into a plan. //
+**Three: wait**
 
-`[CLICK]` I will practise every day. / Not for hours. Every day, even when I am tired. //
+`[CLICK]` Third, and this is the hard one. // You water, and you water, and nothing happens. // This is where most people stop. //
 
-`[CLICK]` And I will take one mock test a month. / So on exam day, nothing is new. //
+`[CLICK]` But look under the ground. // Progress is like roots. / It grows first, and it grows where nobody can see it. //
 
-**Goal two: a better job** *(2:35–3:20)*
+`[CLICK]` So keep watering, / even on the days when you see nothing. //
 
-`[CLICK]` Second: a better remote job. / And here, I do not start from zero. //
+`[CLICK]` And then, one morning, it breaks through. //
 
-`[CLICK]` I will show real projects: websites I made for real people. //
+**Four: storms**
 
-`[CLICK]` I will ask my network. / The people who know my work can open doors. //
+`[CLICK]` Fourth: hard days are like storms. / You will fail a test. You will hear "no". You will want to stop. //
 
-`[CLICK]` And I will apply in English, with confidence, because of goal one. //
+`[CLICK]` But the plant does not survive because of what you can see. / (1) It survives because of its roots. // It bends. It does not fall. //
 
-**Everything connects** *(3:20–3:55)*
+**Five: fruit**
 
-`[CLICK]` While I prepared this talk, I noticed something. / (1) My goals are connected. //
+`[CLICK]` Fifth: it grows. / Slowly, and then all at once. //
 
-`[CLICK]` My websites are my proof. / `[CLICK]` My network opens doors. / `[CLICK]` And C1 gets me interviews. / Together, they take me to a better job. //
+`[CLICK]` And success is like fruit. / It is sweet, but it is not only for you. //
 
-**This week** *(3:55–4:10)*
+`[CLICK]` Because inside every fruit, there are new seeds. // When you reach your goal, you can help someone else begin. //
 
-`[CLICK]` A plan without a date is only a dream. // (1) So this week, I book my exam. //
+`[CLICK]` One seed. / Many trees. //
 
-**Close** *(4:10–4:30)*
+**Close**
 
-`[CLICK]` So I ask you again. / (1) Where are you going? ///
+`[CLICK]` That big tree was small once. // (1) What will you plant? ///
 
 `[CLICK]` Thank you.
 
 ---
 
-**Practise with a timer.** The times above are an estimate of about 4:30, which leaves room for your own examples. Stay under 5:00. If you run long, cut words, never pauses.
+**Practise with a timer.** The estimate is between 4:35 and 5:00, depending on your speed. Stay under 5:00. If you run long, cut words, never pauses.

@@ -1,34 +1,29 @@
-/* Title cards from a film: white letters on black, cutting to black between ideas. The dark is the pause. */
+/* Film title cards beside a living drawing: white letters on black, one idea per screen. */
 
 .stage.cine { background: #000; }
+.cine .canvas { position: relative; z-index: 1; }
 .cine .progress { display: none; }
+.cine .blackout { z-index: 3; }
+.ci-garden { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
 .ci {
+  position: relative;
   width: 1600px;
   height: 900px;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 18px;
   color: #f4f2ee;
   font-family: 'Bebas Neue', 'Inter Tight', sans-serif;
-  text-align: center;
-  animation: ci-drift 14s linear both;
 }
 .ci p { margin: 0; line-height: 1; }
+.ci-text { position: absolute; left: 100px; top: 150px; white-space: nowrap; }
+.ci-text.top { left: 0; top: 56px; width: 1600px; text-align: center; }
 
 /* each title arrives out of the dark, with its letters closing up */
-.ci-title { font-size: 220px; letter-spacing: 0.05em; animation: ci-in 1.5s ease-out 0.45s both; }
-.ci-title.small { font-size: 132px; }
-.ci-over { font-size: 62px; letter-spacing: 0.42em; margin-right: -0.42em; color: #a8a8a8; animation: ci-in 1.5s ease-out 0.45s both; }
-.ci-pair { display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline; gap: 44px; font-size: 132px; letter-spacing: 0.05em; animation: ci-in 1.2s ease-out both; }
-.ci-pair span { text-align: right; color: #a8a8a8; }
-.ci-pair i { width: 110px; height: 3px; background: #6b6b6b; align-self: center; }
-.ci-pair b { text-align: left; font-weight: 400; }
+.ci-title { font-size: 142px; letter-spacing: 0.04em; line-height: 1.02 !important; animation: ci-in 1.2s ease-out 0.25s both; }
+.ci-text.top .ci-title { font-size: 124px; }
+.ci-over { margin-bottom: 14px !important; font-size: 52px; letter-spacing: 0.34em; color: #ffc72c; animation: ci-in 1.2s ease-out 0.25s both; }
 
-@keyframes ci-in { from { opacity: 0; letter-spacing: 0.16em; } to { opacity: 1; } }
-@keyframes ci-drift { from { transform: scale(1); } to { transform: scale(1.04); } }
+@keyframes ci-in { from { opacity: 0; letter-spacing: 0.13em; } to { opacity: 1; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .ci, .ci-title, .ci-over, .ci-pair { animation: none; }
+  .ci-title, .ci-over { animation: none; }
 }
