@@ -3,7 +3,7 @@ import { AgentsBackdrop, slides as agents } from './agents'
 import { slides as design } from './design'
 import { EmotionsBackdrop, slides as emotions } from './emotions'
 import { slides as failure } from './failure'
-import { slides as globalization } from './globalization'
+import { BoardBackdrop, slides as globalization } from './globalization'
 import { GardenBackdrop, slides as goals } from './goals'
 import { slides as leaders } from './leaders'
 
@@ -12,7 +12,7 @@ export const decks: DeckDef[] = [
   { path: '/failure', title: 'The Importance of Failure in Success', minutes: 5, slides: failure },
   { path: '/design', title: 'Good Design Makes a Product Useful', minutes: 3, slides: design },
   { path: '/leaders', title: 'Homeless to Leaders', minutes: 2, accent: '#c8102e', slides: leaders },
-  { path: '/globalization', title: 'Globalisation is a Myth', minutes: 3, accent: '#25d366', slides: globalization, theme: 'chat' },
+  { path: '/globalization', title: 'Globalisation is a Myth', minutes: 3, accent: '#f6c445', slides: globalization, theme: 'board', Backdrop: BoardBackdrop },
   { path: '/agents', title: 'Everyday AI Agents', minutes: 20, accent: '#2236c8', slides: agents, theme: 'kinetic', Backdrop: AgentsBackdrop },
   { path: '/emotions', title: 'How Do You Feel? Emotions & Emojis', minutes: 20, accent: '#0e7f86', slides: emotions, theme: 'feelings', Backdrop: EmotionsBackdrop },
   { path: '/goals', title: 'A Goal Is Like a Seed', minutes: 5, accent: '#5fc77a', slides: goals, theme: 'cine', Backdrop: GardenBackdrop },

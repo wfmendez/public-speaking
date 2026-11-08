@@ -1,193 +1,155 @@
 import './globalization.css'
-import { useContext, type ReactNode } from 'react'
-import { StepContext } from '../../components/Draw'
+import { useEffect, useRef, useState } from 'react'
 import type { SlideDef } from '../../deck'
 import { Flag, type Country } from './Flag'
 
 /*
- * "Globalisation is a Myth": a 3-minute persuasive talk told as the campus group chat.
- * Every click drops one new message in; once it lands, nothing moves (attention stays on the speaker).
- * Speaker notes are written above each slide.
+ * "Globalisation is a Myth": the whole talk is one airport departure board.
+ * The board stays on screen between slides (it is the deck's Backdrop); on every click its split-flap
+ * tiles flip from the old text to the new one, then everything stays still while you speak.
+ * Never more than six words on the board at once. The script is in SCRIPT.md.
  */
 
-const useS = () => useContext(StepContext)
+const COLS = 20
+const ROWS = 6
 
-type Person = { name: string; c: Country; color: string }
-const P = {
-  mia: { name: 'Mia', c: 'us', color: '#53bdeb' },
-  lara: { name: 'Lara', c: 'ar', color: '#f5a623' },
-  joao: { name: 'João', c: 'br', color: '#2bd17e' },
-  cami: { name: 'Camila', c: 'pe', color: '#ff7b9c' },
-  jonas: { name: 'Jonas', c: 'de', color: '#c39bff' },
-  admin: { name: 'Campus Admin', c: 'cz', color: '#ffd166' },
-} satisfies Record<string, Person>
+type Color = 'y' | 'w' | 'r' | 'g'
+type Row = { text?: string; right?: string; color?: Color; rightColor?: Color; flag?: Country }
+type Screen = { clock: string; rows: Row[] }
 
-/** The chat window: header, wallpaper and a column of messages pinned to the bottom. */
-function Chat({ children, center }: { children: ReactNode; center?: boolean }) {
-  return (
-    <foreignObject x={0} y={0} width={1600} height={900}>
-      <div className="gc">
-        <header className="gc-top">
-          <div className="gc-av">🌍</div>
-          <div>
-            <div className="gc-name">International Campus <Flag c="cz" size={34} /></div>
-            <div className="gc-sub">Lara, João, Mia, Camila, Jonas, You + 44</div>
-          </div>
-        </header>
-        <div className={`gc-body${center ? ' center' : ''}`}>{children}</div>
-      </div>
-    </foreignObject>
-  )
+const center = (text: string, color?: Color): Row => ({ text, color })
+
+/** A board for one moment of the talk: the clock and up to six rows. */
+const S = (clock: string, ...rows: (Row | null)[]): Screen => ({ clock, rows: rows.map((r) => r ?? {}) })
+const _ = null
+
+// One list per slide; one screen per click.
+const SCREENS: Screen[][] = [
+  // 0 · Title: an empty board flips to the title
+  [
+    S('08:59'),
+    S('09:00', _, center('GLOBALISATION'), _, center('IS A MYTH', 'r')),
+  ],
+  // 1 · Set-up
+  [
+    S('09:00', _, center('23 COUNTRIES'), _, center('ONE ROOF', 'w')),
+    S('09:00', _, _, center('GLOBAL NOW?', 'w')),
+  ],
+  // 2 · Proposition
+  [
+    S('09:00', _, center('PASSPORTS TRAVEL')),
+    S('09:00', _, center('PASSPORTS TRAVEL'), _, center('HEARTS STAY HOME', 'r')),
+  ],
+  // 3 · Objections: on paper, everything happens in English
+  [
+    S('09:00', _, { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }),
+    S('13:00', _, { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }, { text: 'LUNCH', right: 'ENGLISH', rightColor: 'g' }),
+    S('18:00', _, { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }, { text: 'LUNCH', right: 'ENGLISH', rightColor: 'g' }, { text: 'TRIPS', right: 'ENGLISH', rightColor: 'g' }),
+  ],
+  // 4 · Evidence 1: the 7:01 PM clock
+  [
+    S('19:00', _, { text: 'ENGLISH', right: 'ON TIME', rightColor: 'g' }),
+    S('19:01', _, { text: 'ENGLISH', right: 'CANCELLED', color: 'w', rightColor: 'r' },
+      { text: 'ESPAÑOL', right: 'BOARDING', rightColor: 'g', flag: 've' },
+      { text: 'PORTUGUÊS', right: 'BOARDING', rightColor: 'g', flag: 'br' }),
+  ],
+  // 5 · Evidence 2: our stomachs have a flag
+  [
+    S('20:00', _, { text: 'MATE', flag: 'ar' }, { text: 'PÃO DE QUEIJO', flag: 'br' }),
+    S('20:00', _, { text: 'MATE', flag: 'ar' }, { text: 'PÃO DE QUEIJO', flag: 'br' }, { text: 'CEVICHE', flag: 'pe' }, { text: 'AREPA', flag: 've' }),
+  ],
+  // 6 · Evidence 3: the party test (the bars are the energy on the dance floor)
+  [
+    S('22:00', _, { text: 'POP', right: '#      ', rightColor: 'w' }),
+    S('22:00', _, { text: 'POP', right: '#      ', rightColor: 'w' }, { text: 'FUNK', right: '#####  ', rightColor: 'g', flag: 'br' }),
+    S('22:00', _, { text: 'POP', right: '#      ', rightColor: 'w' }, { text: 'FUNK', right: '#####  ', rightColor: 'g', flag: 'br' }, { text: 'REGGAETON', right: '#######', rightColor: 'r', flag: 've' }),
+  ],
+  // 7 · Wrap-up
+  [
+    S('23:59', _, center('HOME TRAVELS'), _, center('WITH US', 'w')),
+    S('23:59', _, center('THE CHOICE'), _, center('IS OURS', 'g')),
+  ],
+]
+
+export const slides: SlideDef[] = SCREENS.map((s) => ({ steps: s.length - 1, Slide: () => null }))
+
+/** The characters a tile can show, in the order the flaps fall. "#" is a solid tile. */
+const CHARS = " ABCDEFGHIJKLMNOPQRSTUVWXYZÃÊÑ0123456789:?.-#"
+
+function flapPath(from: string, to: string) {
+  const t = CHARS.indexOf(to)
+  if (t < 0) return [to]
+  let f = CHARS.indexOf(from)
+  if (f < 0) f = t
+  const out: string[] = []
+  for (let i = f; i !== t; ) { i = (i + 1) % CHARS.length; out.push(CHARS[i]) }
+  return out.slice(-9)
 }
 
-/** One message; it appears at click `at` and leaves at click `until`. */
-function Msg({ from, at = 0, until, big, react, children }: {
-  from?: Person; at?: number; until?: number; big?: boolean; react?: string; children: ReactNode
-}) {
-  const s = useS()
-  const shown = s >= at && (until === undefined || s < until)
-  if (until !== undefined && s >= until) return null
+/** One split-flap tile: on a new character it flips through the letters before it, then stops. */
+function Flap({ ch, color, delay }: { ch: string; color: Color; delay: number }) {
+  const [shown, setShown] = useState(' ')
+  const cur = useRef(' ')
+  useEffect(() => {
+    if (cur.current === ch) return
+    const seq = flapPath(cur.current, ch)
+    let i = 0
+    let iv = 0
+    const to = window.setTimeout(() => {
+      iv = window.setInterval(() => {
+        cur.current = seq[i]
+        setShown(seq[i])
+        if (++i >= seq.length) window.clearInterval(iv)
+      }, 42)
+    }, delay)
+    return () => { window.clearTimeout(to); window.clearInterval(iv) }
+  }, [ch, delay])
   return (
-    <div className={`msg${from ? '' : ' me'}${big ? ' big' : ''}${shown ? ' in' : ''}`}>
-      {from && <div className="who" style={{ color: from.color }}>{from.name} <Flag c={from.c} size={26} /></div>}
-      <div className="txt">{children}</div>
-      {react && <div className="react">{react}</div>}
+    <div className={`tile c-${color}${shown === '#' ? ' solid' : ''}`}>
+      <span key={shown}>{shown === '#' ? '' : shown}</span>
     </div>
   )
 }
 
-/** A centred chip: a time, or something the group did. */
-function Chip({ at = 0, until, hot, children }: { at?: number; until?: number; hot?: boolean; children: ReactNode }) {
-  const s = useS()
-  if (until !== undefined && s >= until) return null
-  return <div className={`chip${hot ? ' hot' : ''}${s >= at ? ' in' : ''}`}>{children}</div>
+/** Lays a row out on the 20 tiles: centred text, or text on the left and a status on the right. */
+function layout(row: Row) {
+  const chars: string[] = Array(COLS).fill(' ')
+  const colors: Color[] = Array(COLS).fill(row.color ?? 'y')
+  if (row.right !== undefined) {
+    ;[...(row.text ?? '')].forEach((c, i) => { chars[i] = c })
+    const r = [...row.right]
+    r.forEach((c, i) => { chars[COLS - r.length + i] = c; colors[COLS - r.length + i] = row.rightColor ?? 'y' })
+  } else if (row.text) {
+    const t = [...row.text]
+    const start = Math.floor((COLS - t.length) / 2)
+    t.forEach((c, i) => { chars[start + i] = c })
+  }
+  return { chars, colors }
 }
 
-/** A shared song, like a music link in the chat. */
-function Song({ from, at, title, by, react }: { from?: Person; at: number; title: string; by: string; react: string }) {
+export function BoardBackdrop({ slide, step }: { slide: number; step: number }) {
+  const list = SCREENS[slide] ?? SCREENS[0]
+  const screen = list[Math.min(step, list.length - 1)]
+  const rows = Array.from({ length: ROWS }, (_, i) => screen.rows[i] ?? {})
   return (
-    <Msg from={from} at={at} react={react}>
-      <div className="song"><span className="disc">♪</span><span><b>{title}</b><br /><em>{by}</em></span></div>
-    </Msg>
+    <div className="fb-wrap">
+      <div className="fb">
+        <div className="fb-top">
+          <svg className="plane" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" /></svg>
+          <div className="fb-clock">
+            {[...screen.clock].map((c, i) => <Flap key={i} ch={c} color="w" delay={i * 30} />)}
+          </div>
+        </div>
+        {rows.map((row, r) => {
+          const { chars, colors } = layout(row)
+          return (
+            <div className="fb-row" key={r}>
+              <div className="fb-flag">{row.flag && <span key={row.flag} className="flag-in"><Flag c={row.flag} size={70} /></span>}</div>
+              {chars.map((c, i) => <Flap key={i} ch={c} color={colors[i]} delay={r * 45 + i * 22} />)}
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }
-
-export const slides: SlideDef[] = [
-  // 0 · Title, on screen while you walk up
-  {
-    steps: 0,
-    Slide: () => (
-      <Chat center>
-        <Chip>📌 Pinned message</Chip>
-        <Msg big>Globalisation<br />is a <span className="red">myth.</span></Msg>
-      </Chat>
-    ),
-  },
-
-  // 1 · Set-up (≈30 s)
-  // "Fifty of us, twenty-three countries, one building in the Czech Republic. We study together, eat together,
-  //  even fight for the same washing machine together. So we are global now… aren't we? Today I'll tell you
-  //  why I don't think so."
-  {
-    steps: 2,
-    Slide: () => (
-      <Chat center>
-        <Chip>You were added to <b>International Campus</b></Chip>
-        <Msg from={P.admin} at={1}>Welcome! 🏠 <b>1 building · 23 countries · 50 people</b></Msg>
-        <Msg from={P.mia} at={2}>So we're all global citizens now, right? 🌍</Msg>
-      </Chat>
-    ),
-  },
-
-  // 2 · Proposition (≈30 s)
-  // "My answer is no. Globalisation, the idea that living together turns us into one global culture, is a myth.
-  //  Our passports cross borders, sure. But our habits, our food, our music, our hearts… they stay at home."
-  {
-    steps: 1,
-    Slide: () => (
-      <Chat center>
-        <Msg big>No. Globalisation is a <span className="red">myth.</span></Msg>
-        <Msg at={1} react="😮 12  🤔 9">Our passports cross borders.<br />Our habits stay home. 🏠</Msg>
-      </Chat>
-    ),
-  },
-
-  // 3 · Objections (≈30 s)
-  // "I know what you're thinking. We have classes together in English, we have lunch together, we travel to
-  //  Vienna together. On paper we look very global. Isn't that proof? Well… from nine to seven, maybe."
-  {
-    steps: 2,
-    Slide: () => (
-      <Chat>
-        <Chip>9:00 AM</Chip>
-        <Msg from={P.jonas}>Class in room 204, don't be late 📚</Msg>
-        <Msg from={P.mia} at={1}>Lunch together after? 🍝</Msg>
-        <Msg from={P.cami} at={1}>Weekend trip to Vienna?? 🚆</Msg>
-        <Msg at={2} react="👍 18">OK… isn't this proof we're global? 🤔</Msg>
-      </Chat>
-    ),
-  },
-
-  // 4 · Evidence 1: the 7:01 PM clock (≈30 s)
-  // "But watch what happens at 7:01 PM. Class is over, and suddenly English disappears. Spanish over here,
-  //  Portuguese over there. And poor Mia is left asking: guys… English?"
-  {
-    steps: 2,
-    Slide: () => (
-      <Chat>
-        <Chip>7:00 PM</Chip>
-        <Msg from={P.jonas}>Great class today, everyone!</Msg>
-        <Chip at={1} hot>7:01 PM</Chip>
-        <Msg from={P.lara} at={1}>¿Alguien quiere tomar mate? 🧉</Msg>
-        <Msg from={P.joao} at={1}>Bora, galera! Quem vem? 🙌</Msg>
-        <Msg from={P.mia} at={2} react="😂 41">guys… english? 😅</Msg>
-      </Chat>
-    ),
-  },
-
-  // 5 · Evidence 2: our stomachs have a flag (≈30 s)
-  // "Second: our stomachs. Lara never goes anywhere without her mate. João's pão de queijo, rice and beans.
-  //  Camila's ceviche. And me? I'd cross the whole city for an arepa. We share a kitchen, not a cuisine."
-  {
-    steps: 2,
-    Slide: () => (
-      <Chat>
-        <Chip>Shared kitchen 🍳</Chip>
-        <Msg from={P.lara}>Mate at mine 🧉</Msg>
-        <Msg from={P.joao} at={1}>Pão de queijo + arroz e feijão 🧀</Msg>
-        <Msg from={P.cami} at={1}>Ceviche tonight 🍋🐟</Msg>
-        <Msg at={2} react="❤️ 50">I'm making arepas 🫓 Who's in?</Msg>
-      </Chat>
-    ),
-  },
-
-  // 6 · Evidence 3: the party test (≈30 s)
-  // "And the final test: the party. International pop plays… polite dancing. Then Brazilian funk: the Brazilians
-  //  explode. Salsa, reggaeton: the Latinos take over the floor. Our energy comes from home."
-  {
-    steps: 2,
-    Slide: () => (
-      <Chat>
-        <Chip>Party, Saturday 10 PM 🎉</Chip>
-        <Song from={P.jonas} at={0} title="Global Pop Hit" by="Played in every airport" react="👍 3" />
-        <Song from={P.joao} at={1} title="Funk Brasileiro" by="Volume: maximum" react="🔥 22  💃 19" />
-        <Song at={2} title="Salsa → Reggaeton" by="Latin America takes the floor" react="🔥 47  💃 38  🙌 30" />
-      </Chat>
-    ),
-  },
-
-  // 7 · Wrap-up (≈30 s)
-  // "So, is globalisation real? I don't think it is. And honestly, that's the best part. We don't become one
-  //  culture; we bring fifty of them. We always carry our home country in our backpack. The choice is ours:
-  //  open it and share it. That's what makes this place special, isn't it?"
-  {
-    steps: 2,
-    Slide: () => (
-      <Chat center>
-        <Msg big>We always carry home in our backpack 🎒</Msg>
-        <Msg at={1}>Let's open it and share it.</Msg>
-        <Msg from={P.mia} at={2} react="❤️ 50">That's what makes this place special, isn't it? 🌍</Msg>
-      </Chat>
-    ),
-  },
-]
