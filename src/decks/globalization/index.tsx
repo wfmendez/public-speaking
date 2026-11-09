@@ -65,9 +65,8 @@ const SCREENS: Screen[][] = [
   ],
   // 6 · Evidence 3: the party test (the bars are the energy on the dance floor)
   [
-    S('22:00', _, { text: 'POP', right: '#      ', rightColor: 'w' }),
-    S('22:00', _, { text: 'POP', right: '#      ', rightColor: 'w' }, { text: 'FUNK', right: '#####  ', rightColor: 'g', flag: 'br' }),
-    S('22:00', _, { text: 'POP', right: '#      ', rightColor: 'w' }, { text: 'FUNK', right: '#####  ', rightColor: 'g', flag: 'br' }, { text: 'REGGAETON', right: '#######', rightColor: 'r', flag: 've' }),
+    S('22:00', _, { text: 'BRAZILIANS', right: '#####  ', rightColor: 'g' }),
+    S('22:00', _, { text: 'BRAZILIANS', right: '#####  ', rightColor: 'g' }, { text: 'LATINOS', right: '#######', rightColor: 'r' }),
   ],
   // 7 · Wrap-up
   [
