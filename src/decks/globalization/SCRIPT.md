@@ -27,7 +27,7 @@ seven o'clock."
   You've seen it happen, *haven't you*?"
 - **Our stomachs have a flag** · *MATE / PÃO DE QUEIJO*
   "Reason two: **our** stomachs. Lara never goes anywhere without her mate. Our Brazilian friends and their pão de
-  queijo. ▶ Ceviche from Peru, tacos from Mexico. And me? I'd cross Prague for an arepa. **We** share a kitchen, not a cuisine."
+  queijo. ▶ Ceviche from Peru, Valentina sauce from Mexico. And me? I'd cross Prague for an arepa. **We** share a kitchen, not a cuisine."
 - **The party test** · *POP → FUNK → REGGAETON*
   "Reason three: the party test. International pop: polite dancing. ▶ Brazilian funk: the Brazilians explode.
   ▶ Reggaeton: the whole floor goes crazy. **Our** energy still comes from home, *doesn't it*?"

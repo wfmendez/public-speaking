@@ -56,7 +56,7 @@ const SCREENS: Screen[][] = [
   // 5 · Evidence 2: our stomachs have a flag
   [
     S('20:00', _, { text: 'MATE', flag: 'ar' }, { text: 'PÃO DE QUEIJO', flag: 'br' }),
-    S('20:00', _, { text: 'MATE', flag: 'ar' }, { text: 'PÃO DE QUEIJO', flag: 'br' }, { text: 'CEVICHE', flag: 'pe' }, { text: 'AREPA', flag: 've' }, { text: 'TACOS', flag: 'mx' }),
+    S('20:00', _, { text: 'MATE', flag: 'ar' }, { text: 'PÃO DE QUEIJO', flag: 'br' }, { text: 'CEVICHE', flag: 'pe' }, { text: 'AREPA', flag: 've' }, { text: 'VALENTINA', flag: 'mx' }),
   ],
   // 6 · Evidence 3: the party test (the bars are the energy on the dance floor)
   [
