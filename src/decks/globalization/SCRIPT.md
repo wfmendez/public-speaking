@@ -6,8 +6,8 @@ Never more than six words on the board. The rapport tools from the worksheet are
 
 **0 · Title** (empty board while you walk up) ▶ *GLOBALISATION IS A MYTH*
 
-**1 · Set-up (30 s)** · *23 COUNTRIES / ONE ROOF*
-"Look around. Twenty-three countries, one roof, here in the Czech Republic. **We** study together, **we** cook together,
+**1 · Set-up (30 s)** · *DIFFERENT COUNTRIES / ONE ACADEMY*
+"Look around. Different countries, one academy, here in the Czech Republic. **We** study together, **we** cook together,
 **we** even fight for the same washing machine. ▶ *GLOBAL NOW?* So **we**'re all global citizens now, *aren't we*?"
 
 **2 · Proposition (30 s)** · *PASSPORTS TRAVEL*
@@ -15,9 +15,9 @@ Never more than six words on the board. The rapport tools from the worksheet are
 turn **us** into one global culture. **Our** passports travel, sure. ▶ *HEARTS STAY HOME* But **our** habits, **our**
 food, **our** music… **our** hearts stay at home."
 
-**3 · Objections (30 s)** · *CLASS → LUNCH → TRIPS · ENGLISH*
-"Now, I know what you're thinking. **We** have class in English, ▶ lunch in English, ▶ weekend trips to Vienna in
-English. On paper, **we** look very global. _Isn't that proof enough?_ It's a fair point, *isn't it*? But only until
+**3 · Objections (30 s)** · *CLASS · LUNCH: ENGLISH → TRIPS: DEPENDS*
+"Now, I know what you're thinking. **We** have class in English, ▶ lunch in English, ▶ and weekend trips to Vienna… well,
+that depends on who's in the car. On paper, **we** look very global. _Isn't that proof enough?_ It's a fair point, *isn't it*? But only until
 seven o'clock."
 
 **4 · Evidence (60 s), three reasons**
@@ -27,7 +27,7 @@ seven o'clock."
   You've seen it happen, *haven't you*?"
 - **Our stomachs have a flag** · *MATE / PÃO DE QUEIJO*
   "Reason two: **our** stomachs. Lara never goes anywhere without her mate. Our Brazilian friends and their pão de
-  queijo. ▶ Ceviche from Peru. And me? I'd cross Prague for an arepa. **We** share a kitchen, not a cuisine."
+  queijo. ▶ Ceviche from Peru, tacos from Mexico. And me? I'd cross Prague for an arepa. **We** share a kitchen, not a cuisine."
 - **The party test** · *POP → FUNK → REGGAETON*
   "Reason three: the party test. International pop: polite dancing. ▶ Brazilian funk: the Brazilians explode.
   ▶ Reggaeton: the whole floor goes crazy. **Our** energy still comes from home, *doesn't it*?"

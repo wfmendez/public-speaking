@@ -32,7 +32,7 @@ const SCREENS: Screen[][] = [
   ],
   // 1 · Set-up
   [
-    S('09:00', _, center('23 COUNTRIES'), _, center('ONE ROOF', 'w')),
+    S('09:00', _, center('DIFFERENT COUNTRIES'), _, center('ONE ACADEMY', 'w')),
     S('09:00', _, _, center('GLOBAL NOW?', 'w')),
   ],
   // 2 · Proposition
@@ -44,7 +44,7 @@ const SCREENS: Screen[][] = [
   [
     S('09:00', _, { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }),
     S('13:00', _, { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }, { text: 'LUNCH', right: 'ENGLISH', rightColor: 'g' }),
-    S('18:00', _, { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }, { text: 'LUNCH', right: 'ENGLISH', rightColor: 'g' }, { text: 'TRIPS', right: 'ENGLISH', rightColor: 'g' }),
+    S('18:00', _, { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }, { text: 'LUNCH', right: 'ENGLISH', rightColor: 'g' }, { text: 'TRIPS', right: 'DEPENDS', rightColor: 'w' }),
   ],
   // 4 · Evidence 1: the 7:01 PM clock
   [
@@ -56,7 +56,7 @@ const SCREENS: Screen[][] = [
   // 5 · Evidence 2: our stomachs have a flag
   [
     S('20:00', _, { text: 'MATE', flag: 'ar' }, { text: 'PÃO DE QUEIJO', flag: 'br' }),
-    S('20:00', _, { text: 'MATE', flag: 'ar' }, { text: 'PÃO DE QUEIJO', flag: 'br' }, { text: 'CEVICHE', flag: 'pe' }, { text: 'AREPA', flag: 've' }),
+    S('20:00', _, { text: 'MATE', flag: 'ar' }, { text: 'PÃO DE QUEIJO', flag: 'br' }, { text: 'CEVICHE', flag: 'pe' }, { text: 'AREPA', flag: 've' }, { text: 'TACOS', flag: 'mx' }),
   ],
   // 6 · Evidence 3: the party test (the bars are the energy on the dance floor)
   [
