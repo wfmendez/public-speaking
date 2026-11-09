@@ -42,14 +42,14 @@ const SCREENS: Screen[][] = [
   ],
   // 3 · Objections: on paper, everything happens in English
   [
-    S('09:00', _, { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }),
+    S('09:00', center('9:00 AM', 'w'), { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }),
     S('13:00', _, { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }, { text: 'LUNCH', right: 'ENGLISH', rightColor: 'g' }),
     S('18:00', _, { text: 'CLASS', right: 'ENGLISH', rightColor: 'g' }, { text: 'LUNCH', right: 'ENGLISH', rightColor: 'g' }, { text: 'TRIPS', right: 'DEPENDS', rightColor: 'w' }),
   ],
   // 4 · Evidence 1: the 7:01 PM clock
   [
     S('19:00', _, { text: 'ENGLISH', right: 'ON TIME', rightColor: 'g' }),
-    S('19:01', _, { text: 'ENGLISH', right: 'CANCELLED', color: 'w', rightColor: 'r' },
+    S('19:01', center('7:00 PM', 'w'), { text: 'ENGLISH', right: 'CANCELLED', color: 'w', rightColor: 'r' },
       { text: 'ESPAÑOL', right: 'BOARDING', rightColor: 'g', flag: 've' },
       { text: 'PORTUGUÊS', right: 'BOARDING', rightColor: 'g', flag: 'br' }),
   ],
