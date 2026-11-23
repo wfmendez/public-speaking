@@ -10,9 +10,11 @@ The home page (`/`) lists every talk made so far:
 | Homeless to Leaders (2 min, red accent) | `/leaders` | [SCRIPT-leaders.md](SCRIPT-leaders.md) |
 | Everyday AI Agents (20 min class: a 3-min sung opening music video, kinetic type + 3D line art with Three.js and Tailwind, live music — M mutes; story in [STORY-agents-video.md](STORY-agents-video.md)) | `/agents` | [SCRIPT-agents.md](SCRIPT-agents.md) |
 | How Do You Feel? Emotions & Emojis (English lesson with animated 3D emojis made with Three.js, and an activity on the students' phones at `/feel`; no sound) | `/emotions` | [SCRIPT-emotions.md](SCRIPT-emotions.md) |
+| Globalisation is a Myth (3 min, a split-flap departure board) | `/globalization` | [SCRIPT.md](src/decks/globalization/SCRIPT.md) |
 | A Goal Is Like a Seed (5 min, film title cards beside an animated plant that grows screen by screen, 6 words or fewer per screen) | `/goals` | [SCRIPT-goals.md](SCRIPT-goals.md) |
+| What Christlike Leadership Means (10 min, final presentation: lines in candlelight beside candles that light as the story turns; 6 words or fewer per screen, and nothing moves while you speak) | `/christlike` | [SCRIPT.md](src/decks/christlike/SCRIPT.md) |
 
-On the home page, use the mouse, or the arrows/clicker to move between cards and Space/Enter to open one (or press `1`–`6`).
+On the home page, use the mouse, or the arrows/clicker to move between cards and Space/Enter to open one (or press `1`–`8`).
 To get back to the list from a talk, use the browser's back button.
 
 ## Run locally
