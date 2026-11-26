@@ -154,6 +154,8 @@ Las notas del autor sobre la charla, en el orden en que las dio. Cada cambio a l
 
 - **"ISAIAH" va en mayúsculas y en rojo.**
 
+- **Después va "Leeeeeettt'sssss goooo ISAIAH"** tal cual.
+
 ## Diapositivas
 - **No le gustó el estilo vela** (fondo negro, velas). Pidió otras opciones.
 - **Por ahora, papel y lápiz.** El estilo final se busca después.

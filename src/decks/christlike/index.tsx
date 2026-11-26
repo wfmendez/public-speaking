@@ -86,6 +86,7 @@ export const SCENES: Scene[] = [
   screen(['Because Jesus', 'chose you.'], { layout: 'center', keys: ['chose', 'you'] }),
   // Isaiah 6:8: the answer to being chosen
   screen(['ISAIAH'], { layout: 'center', then: 'Here am I; send me.', ink: '#d0021b' }),
+  screen(["Leeeeeettt'sssss", 'goooo ISAIAH'], { layout: 'center' }),
 
   // the close
   screen(['What kind', 'of leader?'], { sketch: 'ahead' }),
