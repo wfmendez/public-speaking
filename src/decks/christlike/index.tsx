@@ -15,9 +15,10 @@ import { Sketch, type SketchName } from './Sketches'
 type Layout = 'top' | 'center' | 'panel'
 
 /** `then`: one more line, in orange, written in on the next click of the same screen. */
+/** `ink`: the main lines in another colour (e.g. red). */
 /** `wait`: the main lines come in on the next click; first only the drawing and the over-line. With `then` too, the orange line comes one click later. */
 /** `x`: where the words are centred across the screen (800 = the middle). */
-type Scene = { lines: string[]; x?: number; over?: string; overSize?: number; layout?: Layout; sketch?: SketchName; then?: string; wait?: boolean; shift?: number; cross?: boolean; check?: boolean; keys?: string[] }
+type Scene = { lines: string[]; x?: number; over?: string; overSize?: number; layout?: Layout; sketch?: SketchName; then?: string; wait?: boolean; shift?: number; cross?: boolean; check?: boolean; keys?: string[]; ink?: string }
 
 const screen = (lines: string[], o: Omit<Scene, 'lines'> = {}): Scene => ({ lines, ...o })
 
@@ -83,6 +84,8 @@ export const SCENES: Scene[] = [
   // the worst person is crossed out, then the best person is written in
   screen(['The worst person.'], { layout: 'center', cross: true, then: 'The best person.' }),
   screen(['Because Jesus', 'chose you.'], { layout: 'center', keys: ['chose', 'you'] }),
+  // Isaiah 6:8: the answer to being chosen
+  screen(['ISAIAH'], { layout: 'center', then: 'Here am I; send me.', ink: '#d0021b' }),
 
   // the close
   screen(['What kind', 'of leader?'], { sketch: 'ahead' }),
@@ -132,7 +135,7 @@ function Words({ scene }: { scene: Scene }) {
       })}
       {lines.map((l, i) => l === then
         ? <T key={l} x={x} y={first + i * gap} size={size} at={wait ? 2 : scene.cross ? scene.lines.length + 1 : 1} accent>{l}</T>
-        : <T key={l} x={x} y={first + i * gap} size={size} at={wait ? 1 : 0} delay={wait ? 0 : (over ? 0.3 : 0) + i * 0.5}>{marked(l, scene.keys)}</T>)}
+        : <g key={l} style={scene.ink ? { '--ink': scene.ink } as CSSProperties : undefined}><T x={x} y={first + i * gap} size={size} at={wait ? 1 : 0} delay={wait ? 0 : (over ? 0.3 : 0) + i * 0.5}>{marked(l, scene.keys)}</T></g>)}
     </>
   )
 }

@@ -150,6 +150,10 @@ Las notas del autor sobre la charla, en el orden en que las dio. Cada cambio a l
 
 - **Después de "The best person." va "Because Jesus chose you."** ("chose you" resaltado); con esto termina la historia.
 
+- **Después de "Because Jesus chose you." va "Isaiah" y con un clic "Here am I; send me."** en naranja (Isaías 6:8).
+
+- **"ISAIAH" va en mayúsculas y en rojo.**
+
 ## Diapositivas
 - **No le gustó el estilo vela** (fondo negro, velas). Pidió otras opciones.
 - **Por ahora, papel y lápiz.** El estilo final se busca después.
