@@ -1,60 +1,37 @@
-/* Words in candlelight: cream serif letters on warm black, beside candles that light during the talk.
-   Everything changes on the click and then stays still. */
+/* The pencil-on-paper slides use the styles in styles.css; this file only adds the short actions on the opening drawings. */
 
-.stage.candle { background: #0b0806; }
-.candle .canvas { position: relative; z-index: 1; }
-.candle .progress { display: none; }
-.candle .blackout { z-index: 3; }
-.cd-candles { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transition: opacity 1.2s ease; }
-
-.cd {
-  position: relative;
-  width: 1600px;
-  height: 900px;
-  color: #f3e6cc;
-  font-family: 'Cormorant Garamond', Georgia, serif;
+/* One short action on a drawing after it has drawn itself (a hop, a shake, a bow, a coin dropping).
+   Each starts right after the click, plays once and is over within about two seconds. */
+.cl-act { transform-box: fill-box; transform-origin: 50% 100%; }
+.cl-hop { animation: cl-hop 0.45s ease-in-out var(--at) 2 both; }
+@keyframes cl-hop { 0%, 100% { transform: none; } 50% { transform: translateY(-22px); } }
+.cl-pop { transform-origin: center; animation: cl-pop 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) var(--at) both; }
+@keyframes cl-pop { from { transform: scale(0); } to { transform: none; } }
+.cl-shake { transform-origin: center; animation: cl-shake 0.14s linear var(--at) 7 both; }
+@keyframes cl-shake {
+  0%, 100% { transform: none; }
+  25% { transform: translate(-6px, 3px) rotate(-1.5deg); }
+  50% { transform: translate(5px, -3px) rotate(1.5deg); }
+  75% { transform: translate(-3px, -2px); }
 }
-.cd p { margin: 0; }
-.cd-text { position: absolute; left: 120px; top: 170px; white-space: nowrap; }
+.cl-fly { transform-origin: center; animation: cl-fly 0.9s cubic-bezier(0.3, 0.6, 0.3, 1) var(--at) both; }
+@keyframes cl-fly { from { transform: translate(-240px, 130px) rotate(-30deg) scale(0.8); } to { transform: none; } }
+.cl-tilt { animation: cl-tilt 0.6s ease-in-out var(--at) 2 both; }
+@keyframes cl-tilt { 0%, 100% { transform: none; } 25% { transform: rotate(-9deg); } 75% { transform: rotate(9deg); } }
+.cl-wave { transform-origin: 0% 100%; animation: cl-wave 0.4s ease-in-out var(--at) 2 both; }
+@keyframes cl-wave { 0%, 100% { transform: none; } 50% { transform: rotate(-18deg); } }
+.cl-flash { animation: cl-flash 0.9s linear var(--at) both; }
+@keyframes cl-flash { 0% { opacity: 1; } 15% { opacity: 0.2; } 30% { opacity: 1; } 45% { opacity: 0.4; } 60%, 100% { opacity: 1; } }
+.cl-bow { transform-box: view-box; animation: cl-bow 0.7s ease-in-out var(--at) both; }
+@keyframes cl-bow { from { transform: var(--from); } to { transform: none; } }
+.cl-drop { animation: cl-drop 0.6s cubic-bezier(0.5, 0, 0.8, 0.6) var(--at) both; }
+@keyframes cl-drop { from { transform: translateY(-160px); opacity: 0; } 30% { opacity: 1; } to { transform: none; } }
 
-.cd-title { font-size: 120px; font-style: italic; font-weight: 500; line-height: 1.04; }
-.cd-over { margin-bottom: 18px !important; font-size: 48px; font-weight: 500; font-variant-numeric: lining-nums; letter-spacing: 0.3em; text-transform: uppercase; color: #c9a46a; }
-
-/* each word comes up out of the dark, one after another, then stays */
-.cd-word { display: inline-block; animation: cd-word 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-@keyframes cd-word { from { opacity: 0; transform: translateY(18px); filter: blur(8px); } }
-
-/* the first screen of a part comes up from black */
-.cd-veil { position: absolute; inset: 0; background: #0b0806; pointer-events: none; animation: cd-veil 1.2s ease both; }
-@keyframes cd-veil { from { opacity: 1; } to { opacity: 0; } }
-
-/* line drawings that trace themselves once */
-.cd-draw {
-  fill: none; stroke: #e7c890; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round;
-  stroke-dasharray: 1 1.001; animation: cd-draw var(--dur) cubic-bezier(0.4, 0, 0.2, 1) var(--delay) both;
-}
-.cd-draw.warm { stroke: #f2a33a; }
-.cd-draw.dim { stroke: #5c4d3c; }
-.cd-draw.shade { stroke: #4a3a2b; stroke-width: 30; stroke-linecap: butt; }
-@keyframes cd-draw { from { stroke-dashoffset: 1.001; } to { stroke-dashoffset: 0; } }
-.cd-hand { transform-box: view-box; transform-origin: 300px 670px; animation: cd-quarter 1.5s ease-in-out 0.7s both; }
-@keyframes cd-quarter { to { transform: rotate(90deg); } }
-
-/* the figure of Christ: lines of light that trace themselves, then stay */
-.cd-christ { transition: opacity 1s ease; }
-.cd-line {
-  fill: none; stroke: #f1d9a8; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85;
-  stroke-dasharray: 1 1.001; stroke-dashoffset: 1.001; transition: stroke-dashoffset 1.4s cubic-bezier(0.4, 0, 0.2, 1) var(--d, 0s);
-}
-.cd-line.on { stroke-dashoffset: 0; }
-
-.cd-wax { transition: fill 1.4s ease; }
-.cd-glow { transform-box: fill-box; transform-origin: center; transition: opacity 1.4s ease, transform 1.6s ease-out; }
-.cd-crowd { transition: opacity 0.9s ease-out; }
-.cd-flame { transform-box: fill-box; transform-origin: 50% 100%; transition: transform 0.9s ease-out, opacity 0.9s ease-out; }
-.cd-flame.off { transform: scale(0.2); opacity: 0; }
+/* flat colours under the pencil lines: they fade in once, just after the line is drawn */
+.cl-fill { opacity: 0; animation: cl-fill 0.5s ease var(--fd, 0.5s) both; }
+@keyframes cl-fill { to { opacity: 1; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .cd-word, .cd-veil, .cd-draw, .cd-hand { animation: none; }
-  .cd-candles, .cd-wax, .cd-glow, .cd-crowd, .cd-flame, .cd-christ, .cd-line { transition: none; }
+  .cl-fill { animation: none; opacity: 1; }
+  .cl-act { animation: none !important; }
 }
