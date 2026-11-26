@@ -1,6 +1,6 @@
 import type { DeckDef } from '../deck'
 import { AgentsBackdrop, slides as agents } from './agents'
-import { CandleBackdrop, slides as christlike } from './christlike'
+import { slides as christlike } from './christlike'
 import { slides as design } from './design'
 import { EmotionsBackdrop, slides as emotions } from './emotions'
 import { slides as failure } from './failure'
@@ -17,5 +17,5 @@ export const decks: DeckDef[] = [
   { path: '/agents', title: 'Everyday AI Agents', minutes: 20, accent: '#2236c8', slides: agents, theme: 'kinetic', Backdrop: AgentsBackdrop },
   { path: '/emotions', title: 'How Do You Feel? Emotions & Emojis', minutes: 20, accent: '#0e7f86', slides: emotions, theme: 'feelings', Backdrop: EmotionsBackdrop },
   { path: '/goals', title: 'A Goal Is Like a Seed', minutes: 5, accent: '#5fc77a', slides: goals, theme: 'cine', Backdrop: GardenBackdrop },
-  { path: '/christlike', title: 'What Christlike Leadership Means', minutes: 10, accent: '#d9953a', slides: christlike, theme: 'candle', Backdrop: CandleBackdrop },
+  { path: '/christlike', title: 'What Christlike Leadership Means', minutes: 10, slides: christlike },
 ]
